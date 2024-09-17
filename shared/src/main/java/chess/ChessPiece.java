@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -11,7 +12,25 @@ import java.util.Collection;
  */
 public class ChessPiece {
 
+    private final ChessGame.TeamColor pieceColor;
+    private final PieceType type;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.pieceColor = pieceColor;
+        this.type = type;
     }
 
     /**
@@ -30,14 +49,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type;
     }
 
     /**
@@ -48,6 +67,32 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+        Collection<ChessMove> moves = new ArrayList<>();
+        if (getPieceType().equals(ChessPiece.PieceType.BISHOP)) {
+            int[][] directions = {
+                    {1, 1},  // top-right
+                    {1, -1}, // top-left
+                    {-1, 1}, // bottom-right
+                    {-1, -1} // bottom-left
+            };
+            //
+            for (int[] direction : directions) {
+                int x = myPosition.getRow();
+                int y = myPosition.getColumn();
+
+                while (true) {
+                    x += direction[0];
+                    y += direction[1];
+
+                    if (x < 1 || x > 8 || y < 1 || y > 8) {
+                        break;
+                    }
+                    ChessPosition newPosition = new ChessPosition(x, y);
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                }
+            }
+        }
+        return moves;
     }
+
 }
