@@ -71,82 +71,97 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        switch (getPieceType()) {
+            case BISHOP:
+                return bishopMoves(board, myPosition);
+            case ROOK:
+                return rookMoves(board, myPosition);
+//            case KING:
+//                return kingMoves(board, myPosition);
+            // Add other cases for additional piece types
+            default:
+                return new ArrayList<>(); // Return empty for unsupported types
+        }
+    }
+
+    public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
-        if (getPieceType().equals(ChessPiece.PieceType.BISHOP)) {
-            int[][] directions = {
-                    {1, 1},  // top-right
-                    {1, -1}, // top-left
-                    {-1, 1}, // bottom-right
-                    {-1, -1} // bottom-left
-            };
+        int[][] directions = {
+                {1, 1},  // top-right
+                {1, -1}, // top-left
+                {-1, 1}, // bottom-right
+                {-1, -1} // bottom-left
+        };
 
-            for (int[] direction : directions) {
-                int x = myPosition.getRow()-1; // converting to 0 based
-                int y = myPosition.getColumn()-1; //converting to 0 based
+        for (int[] direction : directions) {
+            int x = myPosition.getRow() - 1; // converting to 0 based
+            int y = myPosition.getColumn() - 1; //converting to 0 based
 
-                while (true) {
-                    x += direction[0];
-                    y += direction[1];
-                    System.out.println("position: " + x + ", " + y);
-                    //this is zero based (array)
-                    if (x < 0 || x > 7 || y < 0 || y > 7) {
-                        System.out.println("x: " + x + ", y: " + y);
-                        break;
-                    }
-                    //if there is another piece, and the piece is the same color, add move
-                    ChessPosition newPosition = new ChessPosition(x+1, y+1);
-                    ChessPiece pieceAtPosition = board.getPiece(newPosition);
-                    if (pieceAtPosition != null) {
-                        if (pieceAtPosition.getTeamColor().equals(getTeamColor())) {
-                            break;
-                        }
-                        moves.add(new ChessMove(myPosition, newPosition, null));
+            while (true) {
+                x += direction[0];
+                y += direction[1];
+                System.out.println("position: " + x + ", " + y);
+                //this is zero based (array)
+                if (x < 0 || x > 7 || y < 0 || y > 7) {
+                    System.out.println("x: " + x + ", y: " + y);
+                    break;
+                }
+                //if there is another piece, and the piece is the same color, add move
+                ChessPosition newPosition = new ChessPosition(x + 1, y + 1);
+                ChessPiece pieceAtPosition = board.getPiece(newPosition);
+                if (pieceAtPosition != null) {
+                    if (pieceAtPosition.getTeamColor().equals(getTeamColor())) {
                         break;
                     }
                     moves.add(new ChessMove(myPosition, newPosition, null));
+                    break;
                 }
+                moves.add(new ChessMove(myPosition, newPosition, null));
             }
         }
         return moves;
     }
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new HashSet<>();
+        int[][] directions = {
+                {1, 0},  // Down
+                {-1, 0}, // Up
+                {0, 1},  // Right
+                {0, -1}  // Left
+        };
 
-//    public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
-//        Collection<ChessMove> moves = new ArrayList<>();
-//        int[][] directions = {
-//                {1, 1},  // top-right
-//                {1, -1}, // top-left
-//                {-1, 1}, // bottom-right
-//                {-1, -1} // bottom-left
-//        };
-//
-//                    for (int[] direction : directions) {
-//                int x = myPosition.getRow()-1; // converting to 0 based
-//                int y = myPosition.getColumn()-1; //converting to 0 based
-//
-//                while (true) {
-//                    x += direction[0];
-//                    y += direction[1];
-//                    System.out.println("position: " + x + ", " + y);
-//                    //this is zero based (array)
-//                    if (x < 0 || x > 7 || y < 0 || y > 7) {
-//                        System.out.println("x: " + x + ", y: " + y);
-//                        break;
-//                    }
-//                    //if there is another piece, and the piece is the same color, add move
-//                    ChessPosition newPosition = new ChessPosition(x+1, y+1);
-//                    ChessPiece pieceAtPosition = board.getPiece(newPosition);
-//                    if (pieceAtPosition != null) {
-//                        if (pieceAtPosition.getTeamColor().equals(getTeamColor())) {
-//                            break;
-//                        }
-//                        moves.add(new ChessMove(myPosition, newPosition, null));
-//                        break;
-//                    }
-//                    moves.add(new ChessMove(myPosition, newPosition, null));
-//                }
-//    }
+        // Similar logic as bishopMoves for rook
+        for (int[] direction : directions) {
+            int x = myPosition.getRow() - 1; // Convert to 0-based
+            int y = myPosition.getColumn() - 1; // Convert to 0-based
+
+            while (true) {
+                x += direction[0];
+                y += direction[1];
+
+                if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE) {
+                    break; // Out of board bounds
+                }
+
+                ChessPosition newPosition = new ChessPosition(x + 1, y + 1); // Convert back to 1-based
+                ChessPiece pieceAtPosition = board.getPiece(newPosition);
+
+                if (pieceAtPosition != null) {
+                    if (pieceAtPosition.getTeamColor().equals(getTeamColor())) {
+                        break; // Blocked by same color piece
+                    }
+                    moves.add(new ChessMove(myPosition, newPosition, null)); // Capture move
+                    break;
+                }
+                moves.add(new ChessMove(myPosition, newPosition, null)); // Regular move
+            }
+        }
+        return moves;
+    }
+}
+
 //
 //    //rookmoves
 //    //kingmoves
 
-}
+
