@@ -76,8 +76,8 @@ public class ChessPiece {
                 return bishopMoves(board, myPosition);
             case ROOK:
                 return rookMoves(board, myPosition);
-//            case KING:
-//                return kingMoves(board, myPosition);
+            case KING:
+                return kingMoves(board, myPosition);
             // Add other cases for additional piece types
             default:
                 return new ArrayList<>(); // Return empty for unsupported types
@@ -121,6 +121,7 @@ public class ChessPiece {
         }
         return moves;
     }
+
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new HashSet<>();
         int[][] directions = {
@@ -155,6 +156,41 @@ public class ChessPiece {
                 }
                 moves.add(new ChessMove(myPosition, newPosition, null)); // Regular move
             }
+        }
+        return moves;
+    }
+
+    public Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        int[][] directions = {
+                {1, 1},  // top-right
+                {1, -1}, // top-left
+                {-1, 1}, // bottom-right
+                {-1, -1}, // bottom-left
+                {1,0}, //up one
+                {-1,0}, //down one
+                {0,1}, // one right
+                {0,-1} // one left
+        };
+        for (int[] direction : directions) {
+            int x = myPosition.getRow() - 1;
+            int y = myPosition.getColumn() - 1;
+            x += direction[0];
+            y += direction[1];
+            if (x < 0 || x > 7 || y < 0 || y > 7) {
+                break;
+            }
+            ChessPosition newPosition = new ChessPosition(x + 1, y + 1);
+            ChessPiece pieceAtPosition = board.getPiece(newPosition);
+            if (pieceAtPosition != null) {
+                if (pieceAtPosition.getTeamColor().equals(getTeamColor())) {
+                    System.out.println(pieceAtPosition.getTeamColor());
+                    break;
+                }
+                moves.add(new ChessMove(myPosition, newPosition, null));
+                break;
+            }
+            moves.add(new ChessMove(myPosition, newPosition, null));
         }
         return moves;
     }
