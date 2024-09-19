@@ -185,10 +185,10 @@ public class ChessPiece {
             if (pieceAtPosition != null) {
                 if (pieceAtPosition.getTeamColor().equals(getTeamColor())) {
                     System.out.println(pieceAtPosition.getTeamColor());
-                    break;
+                    continue;
                 }
                 moves.add(new ChessMove(myPosition, newPosition, null));
-                break;
+                continue;
             }
             moves.add(new ChessMove(myPosition, newPosition, null));
         }
