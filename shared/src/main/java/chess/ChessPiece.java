@@ -95,8 +95,22 @@ public class ChessPiece {
         ChessPiece currPiece = board.getPiece(myPosition);
         //need to create a team color object to access enum
         ChessGame.TeamColor color = currPiece.getTeamColor();
+        int direction = (color.equals(ChessGame.TeamColor.WHITE)) ? -1 : 1;
+        int startRow = myPosition.getRow();
+        ChessPosition forwardPos = new ChessPosition(myPosition.getRow() + direction, myPosition.getColumn());
         if (color.equals(ChessGame.TeamColor.WHITE)) {
             System.out.println(getTeamColor());
+            if (startRow == 2) {
+                System.out.println(getTeamColor());
+                //check if there is someone to capture
+                //move forward and add move, move forward again and add move
+                if (board.getPiece(forwardPos) == null) {
+                    moves.add(new ChessMove(myPosition,forwardPos,null));
+                }
+
+            }
+            System.out.println(startRow);
+
 
         }
         else if (color.equals(ChessGame.TeamColor.BLACK)) {
