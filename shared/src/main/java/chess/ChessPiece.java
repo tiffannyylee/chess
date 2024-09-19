@@ -78,10 +78,74 @@ public class ChessPiece {
                 return rookMoves(board, myPosition);
             case KING:
                 return kingMoves(board, myPosition);
-            // Add other cases for additional piece types
+            case QUEEN:
+                return queenMoves(board, myPosition);
+            case KNIGHT:
+                return knightMoves(board, myPosition);
+            case PAWN:
+                return pawnMoves(board, myPosition);
             default:
-                return new ArrayList<>(); // Return empty for unsupported types
+                return new ArrayList<>();
         }
+    }
+
+    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        //need to create a chess piece object
+        ChessPiece currPiece = board.getPiece(myPosition);
+        //need to create a team color object to access enum
+        ChessGame.TeamColor color = currPiece.getTeamColor();
+        if (color.equals(ChessGame.TeamColor.WHITE)) {
+            System.out.println(getTeamColor());
+
+        }
+        else if (color.equals(ChessGame.TeamColor.BLACK)) {
+            System.out.println(getTeamColor());
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        int [][] directions  = {
+                {2,1},
+                {2,-1},
+                {1,2},
+                {1,-2},
+                {-2,1},
+                {-2,-1},
+                {-1,2},
+                {-1,-2}
+        };
+
+        for (int[] direction : directions) {
+            //move inside the for loop if it doesnt continue
+            int x = myPosition.getRow() -1;
+            int y = myPosition.getColumn() -1;
+            x += direction[0];
+            y += direction[1];
+            if (x < 0 || y < 0 || x > 7 || y > 7) {
+                continue;
+            }
+            ChessPosition newPosition = new ChessPosition(x + 1, y + 1);
+            ChessPiece pieceAtPosition = board.getPiece(newPosition);
+            if (pieceAtPosition != null) {
+                if (pieceAtPosition.getTeamColor() == pieceColor) {
+                    continue;
+                }
+                moves.add(new ChessMove(myPosition,newPosition,null));
+                continue;
+            }
+            moves.add(new ChessMove(myPosition,newPosition,null));
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new HashSet<>();
+        moves.addAll(bishopMoves(board, myPosition)); // Add Bishop moves
+        moves.addAll(rookMoves(board, myPosition));   // Add Rook moves
+        return moves;
     }
 
     public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
@@ -178,7 +242,7 @@ public class ChessPiece {
             x += direction[0];
             y += direction[1];
             if (x < 0 || x > 7 || y < 0 || y > 7) {
-                break;
+                continue;
             }
             ChessPosition newPosition = new ChessPosition(x + 1, y + 1);
             ChessPiece pieceAtPosition = board.getPiece(newPosition);
