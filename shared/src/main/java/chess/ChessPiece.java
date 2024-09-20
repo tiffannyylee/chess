@@ -101,13 +101,10 @@ public class ChessPiece {
 
         if (forwardPos.getRow() >= 1 && forwardPos.getRow() <= 8 && board.getPiece(forwardPos) == null) {
             if (forwardPos.getRow() == 8 || forwardPos.getRow() == 1) {
-                for (ChessPiece.PieceType promotionType : new ChessPiece.PieceType[]{
-                        ChessPiece.PieceType.ROOK,
-                        ChessPiece.PieceType.KNIGHT,
-                        ChessPiece.PieceType.BISHOP,
-                        ChessPiece.PieceType.QUEEN}) {
-                    moves.add(new ChessMove(myPosition, forwardPos, promotionType));
-                }
+                moves. add(new ChessMove(myPosition, forwardPos, ChessPiece. PieceType.QUEEN));
+                moves. add(new ChessMove(myPosition, forwardPos, ChessPiece. PieceType.ROOK));
+                moves. add(new ChessMove(myPosition, forwardPos, ChessPiece. PieceType.BISHOP));
+                moves. add(new ChessMove(myPosition, forwardPos, ChessPiece. PieceType.KNIGHT));
             } else {
                 moves.add(new ChessMove(myPosition, forwardPos, null));
             }
@@ -123,13 +120,23 @@ public class ChessPiece {
         //capturing diagonals
         int [] sides = {-1,1};
         for (int side:sides) {
-            ChessPosition diagonal = new ChessPosition(myPosition.getRow()+direction, myPosition.getColumn()+side);
+            ChessPosition diagonal = new ChessPosition(myPosition.getRow() + direction, myPosition.getColumn() + side);
             if (diagonal.getColumn() >= 1 && diagonal.getColumn() <= 8) {
                 ChessPiece pieceAtPosition = board.getPiece(diagonal);
                 if (pieceAtPosition != null) {
                     // Only add move if capturing an opponent's piece
                     if (!pieceAtPosition.getTeamColor().equals(color)) {
-                        moves.add(new ChessMove(myPosition, diagonal, null));
+                        if (diagonal.getRow() == 8 || diagonal.getRow() == 1) {
+                            for (ChessPiece.PieceType promotionType : new ChessPiece.PieceType[]{
+                                    ChessPiece.PieceType.ROOK,
+                                    ChessPiece.PieceType.KNIGHT,
+                                    ChessPiece.PieceType.BISHOP,
+                                    ChessPiece.PieceType.QUEEN}) {
+                                moves.add(new ChessMove(myPosition, diagonal, promotionType));
+                            }
+                        } else {
+                            moves.add(new ChessMove(myPosition, diagonal, null));
+                        }
                     }
                 }
             }
