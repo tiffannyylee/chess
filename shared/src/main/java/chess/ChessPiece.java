@@ -95,26 +95,44 @@ public class ChessPiece {
         ChessPiece currPiece = board.getPiece(myPosition);
         //need to create a team color object to access enum
         ChessGame.TeamColor color = currPiece.getTeamColor();
-        int direction = (color.equals(ChessGame.TeamColor.WHITE)) ? -1 : 1;
-        int startRow = myPosition.getRow();
+        int direction = (color.equals(ChessGame.TeamColor.WHITE)) ? 1 : -1;
+        int startRow = myPosition.getRow() -1;
         ChessPosition forwardPos = new ChessPosition(myPosition.getRow() + direction, myPosition.getColumn());
-        if (color.equals(ChessGame.TeamColor.WHITE)) {
-            System.out.println(getTeamColor());
-            if (startRow == 2) {
-                System.out.println(getTeamColor());
-                //check if there is someone to capture
-                //move forward and add move, move forward again and add move
-                if (board.getPiece(forwardPos) == null) {
-                    moves.add(new ChessMove(myPosition,forwardPos,null));
+
+        if (forwardPos.getRow() >= 1 && forwardPos.getRow() <= 8 && board.getPiece(forwardPos) == null) {
+            if (forwardPos.getRow() == 8 || forwardPos.getRow() == 1) {
+                for (ChessPiece.PieceType promotionType : new ChessPiece.PieceType[]{
+                        ChessPiece.PieceType.ROOK,
+                        ChessPiece.PieceType.KNIGHT,
+                        ChessPiece.PieceType.BISHOP,
+                        ChessPiece.PieceType.QUEEN}) {
+                    moves.add(new ChessMove(myPosition, forwardPos, promotionType));
                 }
-
+            } else {
+                moves.add(new ChessMove(myPosition, forwardPos, null));
             }
-            System.out.println(startRow);
 
-
+            //if its the pawns first move
+            if (startRow == 1 || startRow == 6) {
+                ChessPosition twoForward = new ChessPosition(forwardPos.getRow()+direction , forwardPos.getColumn());
+                if (twoForward.getRow() >= 1 && twoForward.getRow() <= 8 && board.getPiece(twoForward) == null) {
+                    moves.add(new ChessMove(myPosition,twoForward,null));
+                }
+            }
         }
-        else if (color.equals(ChessGame.TeamColor.BLACK)) {
-            System.out.println(getTeamColor());
+        //capturing diagonals
+        int [] sides = {-1,1};
+        for (int side:sides) {
+            ChessPosition diagonal = new ChessPosition(myPosition.getRow()+direction, myPosition.getColumn()+side);
+            if (diagonal.getColumn() >= 1 && diagonal.getColumn() <= 8) {
+                ChessPiece pieceAtPosition = board.getPiece(diagonal);
+                if (pieceAtPosition != null) {
+                    // Only add move if capturing an opponent's piece
+                    if (!pieceAtPosition.getTeamColor().equals(color)) {
+                        moves.add(new ChessMove(myPosition, diagonal, null));
+                    }
+                }
+            }
         }
         return moves;
     }
