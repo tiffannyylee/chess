@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -72,9 +73,39 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        ChessPosition kingPosition = findKingPos(teamColor);
+        //see if anybody of the other team can move to this position
+        for (int row = 0; row<8; row++){
+            for (int col = 0; col<8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece pieceAtPos = currentBoard.getPiece(position);
+                //if the piece in the square exists and is our teams color
+                if(pieceAtPos!=null&&pieceAtPos.getTeamColor()!=teamColor){
+                    //create all the possible moves
+                    Collection<ChessMove> opMoves = pieceAtPos.pieceMoves(currentBoard,position);
+                    // iterate through the moves and see if one of them can make it so the king is not in check
+                    for(ChessMove move: opMoves){
+                        ChessBoard copy = currentBoard;
 
+                    }
+                }
+            }
+        }
+        return false;
     }
 
+    private ChessPosition findKingPos(TeamColor team){
+        for (int row = 0; row<8; row++){
+            for (int col = 0; col<8; col++){
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece currPiece = currentBoard.getPiece(position);
+                if (currPiece!=null && currPiece.getPieceType()== ChessPiece.PieceType.KING&&currPiece.getTeamColor()==team){
+                    return position;
+                }
+            }
+        }
+        return null;
+    }
     /**
      * Determines if the given team is in checkmate
      *
@@ -82,7 +113,21 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)){
+            for(int row = 0; row<8; row++){
+                for(int col = 0; col<8; col++){
+                    ChessPosition currPos = new ChessPosition(row,col);
+                    ChessPiece currPiece = currentBoard.getPiece(currPos);
+                    if (currPiece!=null && currPiece.getTeamColor()==teamColor){
+                        Collection<ChessMove> ourMoves = currPiece.pieceMoves(currentBoard, currPos);
+                        for(ChessMove move : ourMoves){
+                            if(move == findKingPos(teamColor))
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
