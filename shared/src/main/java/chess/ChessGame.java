@@ -49,11 +49,28 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece piece = currentBoard.getPiece(startPosition);
-        if(piece == null||piece.getTeamColor()!=currentTeamColor){
+        if(piece == null){
             return null;
         }
-        return piece.pieceMoves(currentBoard, startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(currentBoard, startPosition);
+        for (ChessMove move : moves) {
+            simulateMove(startPosition, move.getEndPosition());
+            if (!isInCheck(currentTeamColor)){
+                validMoves.add(move);
+            }
+            undoMove(move.getEndPosition(), startPosition);
+        }
+        return validMoves;
+    }
+
+    private void simulateMove(ChessPosition moveFrom, ChessPosition moveTo) {
+        ChessMove newMove = new ChessMove(moveFrom, moveTo, null);
+    }
+
+    private void undoMove(ChessPosition moveFrom, ChessPosition moveTo) {
+        ChessMove newMove = new ChessMove(moveFrom, moveTo, null);
     }
 
     /**
@@ -111,21 +128,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (isInCheck(teamColor)){
-            for(int row = 0; row<8; row++){
-                for(int col = 0; col<8; col++){
-                    ChessPosition currPos = new ChessPosition(row,col);
-                    ChessPiece currPiece = currentBoard.getPiece(currPos);
-                    if (currPiece!=null && currPiece.getTeamColor()==teamColor){
-                        Collection<ChessMove> ourMoves = currPiece.pieceMoves(currentBoard, currPos);
-                        for(ChessMove move : ourMoves){
-                            if(move == find)
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+        throw new RuntimeException("Not implemented");
     }
 
     /**
