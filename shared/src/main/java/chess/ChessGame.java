@@ -79,14 +79,12 @@ public class ChessGame {
             for (int col = 0; col<8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece pieceAtPos = currentBoard.getPiece(position);
-                //if the piece in the square exists and is our teams color
                 if(pieceAtPos!=null&&pieceAtPos.getTeamColor()!=teamColor){
-                    //create all the possible moves
                     Collection<ChessMove> opMoves = pieceAtPos.pieceMoves(currentBoard,position);
-                    // iterate through the moves and see if one of them can make it so the king is not in check
                     for(ChessMove move: opMoves){
-                        ChessBoard copy = currentBoard;
-
+                        if(move.getEndPosition()==kingPosition){
+                            return true;
+                        }
                     }
                 }
             }
@@ -121,7 +119,7 @@ public class ChessGame {
                     if (currPiece!=null && currPiece.getTeamColor()==teamColor){
                         Collection<ChessMove> ourMoves = currPiece.pieceMoves(currentBoard, currPos);
                         for(ChessMove move : ourMoves){
-                            if(move == findKingPos(teamColor))
+                            if(move == find)
                         }
                     }
                 }
