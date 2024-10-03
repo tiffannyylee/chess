@@ -98,7 +98,7 @@ public class ChessBoard {
 
     }
     public void initializeDefaultBoard() {
-        resetBoard(); // Call the reset method to initialize the pieces
+        resetBoard();
     }
 
     public ChessBoard copy() {

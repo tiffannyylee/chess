@@ -56,12 +56,11 @@ public class ChessGame {
         if(piece == null){
             return null;
         }
-        setTeamTurn(piece.getTeamColor()); //set team color to what the pieces team color is
         Collection<ChessMove> moves = piece.pieceMoves(currentBoard, startPosition);
         for (ChessMove move : moves) {
             ChessBoard originalBoardState = currentBoard.copy();
             simulateMove(startPosition, move.getEndPosition());
-            if (!isInCheck(currentTeamColor)){
+            if (!isInCheck(piece.getTeamColor())){
                 validMoves.add(move);
             }
             currentBoard = originalBoardState;
@@ -87,7 +86,8 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         ChessPiece pieceToMove = currentBoard.getPiece(move.getStartPosition());
-        if (pieceToMove == null) {
+
+        if (pieceToMove == null|| pieceToMove.getTeamColor() != currentTeamColor) {
             throw new InvalidMoveException();
         }
         for (ChessMove validMove : validMoves) {
@@ -98,6 +98,7 @@ public class ChessGame {
                 }
                 currentBoard.addPiece(validMove.getEndPosition(), pieceToMove);
                 currentBoard.addPiece(validMove.getStartPosition(), null);
+                setTeamTurn(currentTeamColor == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
                 return;
             }
         }
