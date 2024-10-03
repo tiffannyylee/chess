@@ -155,20 +155,20 @@ public class ChessGame {
             for (int col = 0; col < 8; col++) {
                 ChessPosition position = new ChessPosition(row + 1, col + 1); //i changed this to plus one bc get piece goes out of bounds
                 ChessPiece pieceAtPos = currentBoard.getPiece(position);
-                ChessBoard originalBoardState = currentBoard.copy();
                 if (pieceAtPos != null && pieceAtPos.getTeamColor().equals(teamColor)) {
                     Collection<ChessMove> teamMoves = pieceAtPos.pieceMoves(currentBoard, position);
                     for (ChessMove move : teamMoves) {
+                        ChessBoard originalBoardState = currentBoard.copy();
                         simulateMove(position, move.getEndPosition());
                         if (!isInCheck(teamColor)) {
+                            currentBoard = originalBoardState;
                             return false;
                         }
-                    }
-                    currentBoard = originalBoardState;
-
+                        currentBoard = originalBoardState;
                     }
                 }
             }
+        }
         return true;
     }
 
@@ -180,7 +180,34 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) {
+            return false; // If in check, it's not stalemate
+        }
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPosition position = new ChessPosition(row + 1, col + 1); // 1-based indexing
+                ChessPiece pieceAtPos = currentBoard.getPiece(position);
+
+                if (pieceAtPos != null && pieceAtPos.getTeamColor() == teamColor) {
+                    Collection<ChessMove> validMoves = pieceAtPos.pieceMoves(currentBoard, position);
+
+                    // check valid moves
+                    for (ChessMove move : validMoves) {
+                        ChessBoard originalBoardState = currentBoard.copy();
+                        simulateMove(position, move.getEndPosition());
+
+                        if (!isInCheck(teamColor)) {
+                            currentBoard = originalBoardState; // Restore original board
+                            return false;
+                        }
+                        currentBoard = originalBoardState; // Restore original board
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
