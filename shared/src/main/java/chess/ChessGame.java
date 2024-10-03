@@ -16,6 +16,7 @@ public class ChessGame {
     public ChessGame() {
         currentTeamColor = TeamColor.WHITE;
         currentBoard = new ChessBoard();
+        currentBoard.initializeDefaultBoard();
     }
 
     /**
@@ -181,8 +182,9 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInCheck(teamColor)) {
-            return false; // If in check, it's not stalemate
+            return false;
         }
+        boolean hasPieces = false; //check that there are pieces
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
@@ -190,24 +192,23 @@ public class ChessGame {
                 ChessPiece pieceAtPos = currentBoard.getPiece(position);
 
                 if (pieceAtPos != null && pieceAtPos.getTeamColor() == teamColor) {
+                    hasPieces = true;
                     Collection<ChessMove> validMoves = pieceAtPos.pieceMoves(currentBoard, position);
 
-                    // check valid moves
                     for (ChessMove move : validMoves) {
                         ChessBoard originalBoardState = currentBoard.copy();
                         simulateMove(position, move.getEndPosition());
 
                         if (!isInCheck(teamColor)) {
-                            currentBoard = originalBoardState; // Restore original board
+                            currentBoard = originalBoardState;
                             return false;
                         }
-                        currentBoard = originalBoardState; // Restore original board
+                        currentBoard = originalBoardState;
                     }
                 }
             }
         }
-
-        return true;
+        return hasPieces;
     }
 
     /**

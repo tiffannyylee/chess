@@ -12,7 +12,7 @@ import java.util.Objects;
 public class ChessBoard {
     private ChessPiece[][] squares = new ChessPiece[8][8]; //squares is an array of  8x8 chess pieces
     public ChessBoard() {
-        
+
     }
 
     @Override
@@ -96,6 +96,9 @@ public class ChessBoard {
             squares[6][column] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
         }
 
+    }
+    public void initializeDefaultBoard() {
+        resetBoard(); // Call the reset method to initialize the pieces
     }
 
     public ChessBoard copy() {
