@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -90,6 +91,10 @@ public class ChessGame {
         }
         for (ChessMove validMove : validMoves) {
             if (move.equals(validMove)){
+                //check if there is a promo piece and replace pawn if there is
+                if (move.getPromotionPiece()!=null){
+                    pieceToMove = new ChessPiece(pieceToMove.getTeamColor(), move.getPromotionPiece());
+                }
                 currentBoard.addPiece(validMove.getEndPosition(), pieceToMove);
                 currentBoard.addPiece(validMove.getStartPosition(), null);
                 return;
@@ -173,5 +178,26 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return currentBoard;
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "currentTeamColor=" + currentTeamColor +
+                ", currentBoard=" + currentBoard +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return currentTeamColor == chessGame.currentTeamColor && Objects.equals(currentBoard, chessGame.currentBoard);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentTeamColor, currentBoard);
     }
 }
