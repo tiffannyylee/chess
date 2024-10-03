@@ -97,4 +97,17 @@ public class ChessBoard {
         }
 
     }
+
+    public ChessBoard copy() {
+        ChessBoard newBoard = new ChessBoard();
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = squares[row][col];
+                if (piece != null) {
+                    newBoard.squares[row][col] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+                }
+            }
+        }
+        return newBoard;
+    }
 }
