@@ -71,22 +71,14 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        switch (getPieceType()) {
-            case BISHOP:
-                return bishopMoves(board, myPosition);
-            case ROOK:
-                return rookMoves(board, myPosition);
-            case KING:
-                return kingMoves(board, myPosition);
-            case QUEEN:
-                return queenMoves(board, myPosition);
-            case KNIGHT:
-                return knightMoves(board, myPosition);
-            case PAWN:
-                return pawnMoves(board, myPosition);
-            default:
-                return new ArrayList<>();
-        }
+        return switch (getPieceType()) {
+            case BISHOP -> bishopMoves(board, myPosition);
+            case ROOK -> rookMoves(board, myPosition);
+            case KING -> kingMoves(board, myPosition);
+            case QUEEN -> queenMoves(board, myPosition);
+            case KNIGHT -> knightMoves(board, myPosition);
+            case PAWN -> pawnMoves(board, myPosition);
+        };
     }
 
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
@@ -298,9 +290,5 @@ public class ChessPiece {
         return moves;
     }
 }
-
-//
-//    //rookmoves
-//    //kingmoves
 
 
