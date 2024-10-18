@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.UserData;
@@ -30,13 +29,19 @@ public class Server {
     }
 
     private void exceptionHandler(Exception e, Request request, Response response) {
-
+        if (e instanceof DataAccessException) {
+            response.status(400);
+            response.body("{\"message\": \"" + e.getMessage() + "\"}");
+        } else {
+            response.status(500);
+            response.body("{\"message\": \"Internal Server Error\"}");
+        }
     }
 
     private Object createUser(Request request, Response response) throws DataAccessException {
         var newUser = serializer.fromJson(request.body(), UserData.class);
-        var result = service.register(newUser);
-        return serializer.toJson(result);
+        var registeredUser = service.register(newUser);
+        return serializer.toJson(registeredUser);
     }
 
     public void stop() {

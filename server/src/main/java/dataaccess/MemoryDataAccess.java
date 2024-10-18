@@ -6,6 +6,7 @@ import model.UserData;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class MemoryDataAccess implements DataAccess{
     private final Map<String, UserData> users = new HashMap<>();
@@ -16,25 +17,22 @@ public class MemoryDataAccess implements DataAccess{
         if (users.containsKey(userData.username())) {
             throw new DataAccessException("User already exists");
         }
+
+        // Add the new user to the map
         users.put(userData.username(), userData);
         return userData;
     }
 
     @Override
-    public AuthData createAuth(AuthData authData) throws DataAccessException {
-        if (authentication.containsKey(authData.authToken())){
-            throw new DataAccessException("Auth code already exists");
-        }
-        authentication.put(authData.authToken(), authData);
+    public AuthData createAuth(String username) throws DataAccessException {
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, username);
+        authentication.put(authToken, authData);
         return authData;
     }
 
     @Override
-    public UserData getUser(UserData username) throws DataAccessException {
-        UserData user = users.get(username.username());
-        if (user == null) {
-            throw new DataAccessException("User not found");
-        }
-        return user;
+    public UserData getUser(String username) throws DataAccessException {
+        return users.get(username);
     }
 }

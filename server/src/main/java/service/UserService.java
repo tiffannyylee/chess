@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import model.AuthData;
 import model.UserData;
 
 public class UserService {
@@ -9,13 +10,14 @@ public class UserService {
 
     public UserService(DataAccess dataAccess) {this.dataAccess = dataAccess;}
 
-    public UserData register(UserData newUser) throws DataAccessException {
-        if (dataAccess.getUser(newUser)!=null){
+    public AuthData register(UserData newUser) throws DataAccessException {
+        if (dataAccess.getUser(newUser.username())!=null){
             throw new DataAccessException("User already exists");
         }
         dataAccess.createUser(newUser);
-        return newUser;
+        return dataAccess.createAuth(newUser.username());
     }
+
    // public AuthData login(UserData user) {}
     //public void logout(AuthData auth) {}
 }
