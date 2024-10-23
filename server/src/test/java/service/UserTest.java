@@ -64,4 +64,24 @@ public class UserTest {
         assertThrows(UnauthorizedException.class, () -> {
             userService.login(loginUser);
         });    }
+
+    @Test
+    public void testLogoutSuccess() throws DataAccessException {
+        UserData user = new UserData("tiffany", "1234", "test@example.com");
+        userService.register(user);
+        UserData loginUser = new UserData("tiffany", "1234", null); // No need for email during login
+        AuthData authData = userService.login(loginUser);
+
+        assertDoesNotThrow(() -> userService.logout(authData));
+    }
+
+    @Test
+    public void testLogoutFail() throws DataAccessException {
+        UserData user = new UserData("tiffany", "1234", "test@example.com");
+        userService.register(user);
+        UserData loginUser = new UserData("tiffany", "1234", null); // No need for email during login
+        AuthData authData = userService.login(loginUser);
+        userService.logout(authData);//first logout
+        assertThrows(UnauthorizedException.class, () -> userService.logout(authData));
+    }
 }
