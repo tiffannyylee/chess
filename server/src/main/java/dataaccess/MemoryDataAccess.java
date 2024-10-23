@@ -4,6 +4,7 @@ import model.AuthData;
 import model.UserData;
 
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -34,5 +35,16 @@ public class MemoryDataAccess implements DataAccess{
     @Override
     public UserData getUser(String username) throws DataAccessException {
         return users.get(username);
+    }
+
+    @Override
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        return authentication.get(authToken);
+    }
+
+    @Override
+    public AuthData deleteAuth(String authToken) throws DataAccessException{
+        authentication.remove(authToken);
+        return null;
     }
 }

@@ -34,5 +34,12 @@ public class UserService {
         }
         return dataAccess.createAuth(user.username());
     }
-    //public void logout(AuthData auth) {}
+    public void logout(AuthData auth) throws DataAccessException {
+        String token = auth.authToken();
+        AuthData existingAuth = dataAccess.getAuth(token);
+        if (existingAuth == null) {
+            throw new UnauthorizedException("Error: invalid auth token"); // Token not found
+        }
+        dataAccess.deleteAuth(token);
+    }
 }

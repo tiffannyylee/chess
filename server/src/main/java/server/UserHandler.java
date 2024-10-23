@@ -1,7 +1,7 @@
 package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import dataaccess.UnauthorizedException;
+import model.AuthData;
 import model.UserData;
 import requests.LoginRequest;
 import requests.RegisterRequest;
@@ -31,5 +31,13 @@ public class UserHandler {
         var user = new UserData(loginRequest.username(),loginRequest.password(),null);
         var loginUser = userService.login(user);
         return serializer.toJson(new LoginResult(loginUser.username(),loginUser.authToken()));
+    }
+
+    public Object logoutUser(Request request, Response response) throws DataAccessException {
+        String authToken = request.headers("Authorization");
+        AuthData authData = new AuthData(authToken, null);
+        userService.logout(authData);
+        response.status(200);
+        return "";
     }
 }
