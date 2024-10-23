@@ -5,6 +5,8 @@ import model.AuthData;
 import model.UserData;
 import model.GameData;
 
+import java.util.List;
+
 public class GameService {
     private final DataAccess dataAccess;
     private final UserService userService;
@@ -14,8 +16,14 @@ public class GameService {
         this.userService = userService;
     }
 
-    public GameData listGames(String authToken) {
-        return null;
+    public List<GameData> listGames(String authToken) throws DataAccessException {
+        userService.verifyAuth(authToken);
+
+        // Step 2: Retrieve the list of games from the database
+        List<GameData> games = dataAccess.getGames();
+
+        // Step 3: Return the list of games
+        return games;
     }
     public GameData createGame(String gameName, String authToken){
         return null;

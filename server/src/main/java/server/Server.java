@@ -4,14 +4,16 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.UserData;
 import server.UserHandler;
+import service.GameService;
 import service.UserService;
 import spark.*;
 
 public class Server {
     private final Gson serializer = new Gson();
     private final UserService service= new UserService(new MemoryDataAccess());
+    private final GameService gameService = new GameService(service, new MemoryDataAccess());
     private final UserHandler userHandler = new UserHandler(service);
-    private final GameHandler gameHandler = new GameHandler(service);
+    private final GameHandler gameHandler = new GameHandler(service, gameService);
 
 
     public int run(int desiredPort) {

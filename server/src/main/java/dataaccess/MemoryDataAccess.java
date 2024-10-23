@@ -6,9 +6,7 @@ import model.UserData;
 
 
 import javax.xml.crypto.Data;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class MemoryDataAccess implements DataAccess{
     private final Map<String, UserData> users = new HashMap<>();
@@ -51,7 +49,7 @@ public class MemoryDataAccess implements DataAccess{
     }
 
     @Override
-    public GameData getGames() throws DataAccessException {
-        return null;
+    public List<GameData> getGames() {
+        return new ArrayList<>(games.values());
     }
 }
