@@ -13,6 +13,7 @@ import java.util.UUID;
 public class MemoryDataAccess implements DataAccess{
     private final Map<String, UserData> users = new HashMap<>();
     private final Map<String, AuthData> authentication = new HashMap<>();
+    private final Map<String, GameData> games = new HashMap<>();
 
     @Override
     public UserData createUser(UserData userData) throws DataAccessException {

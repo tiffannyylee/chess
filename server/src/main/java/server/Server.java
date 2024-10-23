@@ -11,6 +11,7 @@ public class Server {
     private final Gson serializer = new Gson();
     private final UserService service= new UserService(new MemoryDataAccess());
     private final UserHandler userHandler = new UserHandler(service);
+    private final GameHandler gameHandler = new GameHandler(service);
 
 
     public int run(int desiredPort) {
@@ -23,6 +24,7 @@ public class Server {
         Spark.post("/session", (userHandler::loginUser));
         Spark.delete("/session", (userHandler::logoutUser));
         Spark.delete("/db", (request, response) -> "{}");
+        Spark.get("/game",(gameHandler::listGames));
         Spark.exception(Exception.class, this::exceptionHandler);
         //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();

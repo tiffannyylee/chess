@@ -42,4 +42,11 @@ public class UserService {
         }
         dataAccess.deleteAuth(token);
     }
+    public AuthData verifyAuth(String authToken) throws DataAccessException {
+        AuthData authData = dataAccess.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Invalid auth token");
+        }
+        return authData;
+    }
 }

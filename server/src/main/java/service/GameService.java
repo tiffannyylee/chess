@@ -7,8 +7,12 @@ import model.GameData;
 
 public class GameService {
     private final DataAccess dataAccess;
+    private final UserService userService;
 
-    public GameService(DataAccess dataAccess) {this.dataAccess = dataAccess;}
+    public GameService(UserService userService, DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+        this.userService = userService;
+    }
 
     public GameData listGames(String authToken) {
         return null;
