@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
-import dataaccess.UserAlreadyExistsException;
-import dataaccess.BadRequestException;
+import dataaccess.*;
 import model.UserData;
 import server.UserHandler;
 import service.UserService;
@@ -23,6 +20,8 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", (userHandler::createUser));
+        Spark.post("/session", (userHandler::loginUser));
+        Spark.delete("/session", )
         Spark.delete("/db", (request, response) -> "{}");
         Spark.exception(Exception.class, this::exceptionHandler);
         //This line initializes the server and can be removed once you have a functioning endpoint
@@ -35,15 +34,14 @@ public class Server {
     private void exceptionHandler(Exception e, Request request, Response response) {
         if (e instanceof UserAlreadyExistsException) {
             response.status(403);
-            response.body("{\"message\": \"" + e.getMessage() + "\"}");
-        }else if (e instanceof BadRequestException) {
+        } else if (e instanceof BadRequestException) {
             response.status(400);
-            response.body("{\"message\": \"" + e.getMessage() + "\"}");
-        }
-        else {
+        } else if (e instanceof UnauthorizedException){
+            response.status(401);
+        } else {
             response.status(500);
-            response.body("{\"message\": \"Internal Server Error\"}");
         }
+        response.body("{\"message\": \"Internal Server Error\"}");
     }
 
     public void stop() {

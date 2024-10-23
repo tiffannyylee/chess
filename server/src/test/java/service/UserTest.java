@@ -1,15 +1,15 @@
 package service;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RegisterTest {
+public class UserTest {
     private MemoryDataAccess memoryDataAccess;
     private UserService userService;
 
@@ -40,4 +40,28 @@ public class RegisterTest {
 
         assertEquals("Error: already taken", exception.getMessage());
     }
+
+    @Test
+    public void testLoginSuccess() throws DataAccessException{
+        UserData user = new UserData("tiffany", "1234", "test@example.com");
+        userService.register(user);
+
+        UserData loginUser = new UserData("tiffany", "1234", null); // No need for email during login
+        AuthData authData = userService.login(loginUser);
+
+        assertNotNull(authData); // Ensure authData is not null
+        assertEquals(user.username(), authData.username()); // Ensure the username matches
+        assertNotNull(authData.authToken()); // Ensure the auth token is created
+    }
+
+    @Test
+    public void testLoginBadPassword() throws DataAccessException{
+        UserData user = new UserData("tiffany", "1234", "test@example.com");
+        userService.register(user);
+
+        UserData loginUser = new UserData("tiffany", "wrongpassword", null);
+
+        assertThrows(UnauthorizedException.class, () -> {
+            userService.login(loginUser);
+        });    }
 }

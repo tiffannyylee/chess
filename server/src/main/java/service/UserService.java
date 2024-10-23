@@ -1,11 +1,9 @@
 package service;
 
-import dataaccess.BadRequestException;
-import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.UserAlreadyExistsException;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import requests.LoginRequest;
 
 public class UserService {
     private final DataAccess dataAccess;
@@ -23,8 +21,18 @@ public class UserService {
         return dataAccess.createAuth(newUser.username());
     }
 
-    public AuthData login(UserData user) {
-
+    public AuthData login(UserData user) throws DataAccessException {
+        if (user.username()==null||user.password()==null){
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        UserData storedUser = dataAccess.getUser(user.username());
+        if (storedUser == null) {
+            throw new UnauthorizedException("Error: unauthorized"); // Ensure this is thrown for non-existent users
+        }
+        if (!user.password().equals(storedUser.password())){
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        return dataAccess.createAuth(user.username());
     }
     //public void logout(AuthData auth) {}
 }
