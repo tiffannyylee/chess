@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 
@@ -45,6 +46,11 @@ public class MemoryDataAccess implements DataAccess{
     @Override
     public AuthData deleteAuth(String authToken) throws DataAccessException{
         authentication.remove(authToken);
+        return null;
+    }
+
+    @Override
+    public GameData getGames() throws DataAccessException {
         return null;
     }
 }
