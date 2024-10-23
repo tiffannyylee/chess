@@ -3,13 +3,17 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.UserAlreadyExistsException;
+import dataaccess.BadRequestException;
 import model.UserData;
+import server.UserHandler;
 import service.UserService;
 import spark.*;
 
 public class Server {
     private final Gson serializer = new Gson();
     private final UserService service= new UserService(new MemoryDataAccess());
+    private final UserHandler userHandler = new UserHandler(service);
 
 
     public int run(int desiredPort) {
@@ -18,7 +22,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.post("/user", this::createUser);
+        Spark.post("/user", (userHandler::createUser));
         Spark.delete("/db", (request, response) -> "{}");
         Spark.exception(Exception.class, this::exceptionHandler);
         //This line initializes the server and can be removed once you have a functioning endpoint
@@ -29,19 +33,17 @@ public class Server {
     }
 
     private void exceptionHandler(Exception e, Request request, Response response) {
-        if (e instanceof DataAccessException) {
+        if (e instanceof UserAlreadyExistsException) {
+            response.status(403);
+            response.body("{\"message\": \"" + e.getMessage() + "\"}");
+        }else if (e instanceof BadRequestException) {
             response.status(400);
             response.body("{\"message\": \"" + e.getMessage() + "\"}");
-        } else {
+        }
+        else {
             response.status(500);
             response.body("{\"message\": \"Internal Server Error\"}");
         }
-    }
-
-    private Object createUser(Request request, Response response) throws DataAccessException {
-        var newUser = serializer.fromJson(request.body(), UserData.class);
-        var registeredUser = service.register(newUser);
-        return serializer.toJson(registeredUser);
     }
 
     public void stop() {
