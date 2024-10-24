@@ -63,7 +63,7 @@ public class MemoryDataAccess implements DataAccess{
             throw new DataAccessException("Invalid authentication token");
         }
 
-        int gameID = games.size() + 1;
+        int gameID = games.size()+1;
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(gameID, authData.username(), null, gameName, game);
         games.put(gameID, gameData);
@@ -81,12 +81,13 @@ public class MemoryDataAccess implements DataAccess{
     }
 
     @Override
-    public void joinGame() throws DataAccessException {
-
-    }
-
-    @Override
     public GameData getGame(int gameID) throws DataAccessException {
         return games.get(gameID);
     }
+
+    @Override
+    public void updateGame(GameData updatedGame) throws DataAccessException {
+        games.put(updatedGame.gameID(), updatedGame);
+    }
+
 }

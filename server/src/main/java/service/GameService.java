@@ -49,10 +49,11 @@ public class GameService {
             throw new DataAccessException("Black player already joined");
         }
         if (playerColor.equals("WHITE")) {
-            gameData.withWhiteUsername(authData.username());
+            gameData = gameData.withWhiteUsername(authData.username());
         } else if (playerColor.equals("BLACK")) {
-            gameData.withBlackUsername(authData.username());
+            gameData = gameData.withBlackUsername(authData.username());
         }
+        dataAccess.updateGame(gameData);
     }
 
 }
