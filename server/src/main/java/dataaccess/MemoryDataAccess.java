@@ -1,17 +1,17 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 
 
-import javax.xml.crypto.Data;
 import java.util.*;
 
 public class MemoryDataAccess implements DataAccess{
     private final Map<String, UserData> users = new HashMap<>();
     private final Map<String, AuthData> authentication = new HashMap<>();
-    private final Map<String, GameData> games = new HashMap<>();
+    private final Map<Integer, GameData> games = new HashMap<>();
 
     @Override
     public UserData createUser(UserData userData) throws DataAccessException {
@@ -29,6 +29,8 @@ public class MemoryDataAccess implements DataAccess{
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, username);
         authentication.put(authToken, authData);
+        System.out.println("Created AuthData: " + authData); // Check stored authData
+
         return authData;
     }
 
@@ -51,5 +53,40 @@ public class MemoryDataAccess implements DataAccess{
     @Override
     public List<GameData> getGames() {
         return new ArrayList<>(games.values());
+    }
+
+    @Override
+    public GameData createGame(String gameName, String authToken) throws DataAccessException {
+        AuthData authData = authentication.get(authToken);
+        if (authData == null) {
+            System.out.println("Auth token not found(this is dataaccess creategame method): " + authToken); // Log to check what's happening
+            throw new DataAccessException("Invalid authentication token");
+        }
+
+        int gameID = games.size() + 1;
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(gameID, authData.username(), null, gameName, game);
+        games.put(gameID, gameData);
+
+        return gameData;
+    }
+
+
+
+    @Override
+    public void clear() throws DataAccessException {
+        users.clear();
+        authentication.clear();
+        games.clear();
+    }
+
+    @Override
+    public void joinGame() throws DataAccessException {
+
+    }
+
+    @Override
+    public GameData getGame(int gameID) throws DataAccessException {
+        return games.get(gameID);
     }
 }

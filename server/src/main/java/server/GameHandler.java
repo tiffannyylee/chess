@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.GameData;
+import requests.CreateGameRequest;
+import requests.JoinGameRequest;
 import service.GameService;
 import service.UserService;
 import responses.GameListResult;
@@ -26,10 +28,27 @@ public class GameHandler {
     public Object listGames(Request request, Response response) throws DataAccessException {
         String authToken = request.headers("Authorization");
 
-        // Fetch the list of games
         List<GameData> games = gameService.listGames(authToken);
 
-        // Serialize and return the games list as a JSON response
         return serializer.toJson(new GameListResult(games));
+    }
+
+    public Object createGame(Request request, Response response) throws DataAccessException {
+        String authToken = request.headers("Authorization");
+        CreateGameRequest createGameRequest = serializer.fromJson(request.body(), CreateGameRequest.class);
+        GameData createdGame = gameService.createGame(createGameRequest.gameName(), authToken);
+        response.type("application/json");
+        response.status(200);
+        return serializer.toJson(createdGame);
+    }
+
+    public Object joinGame(Request request, Response response) throws DataAccessException {
+        String authToken = request.headers("Authorization");
+        JoinGameRequest joinGameRequest = serializer.fromJson(request.body(), JoinGameRequest.class);
+        String playerColor = joinGameRequest.playerColor();
+        int gameId = joinGameRequest.gameId();
+        gameService.joinGame(playerColor, gameId, authToken);
+        response.status(200);
+        return "";
     }
 }
