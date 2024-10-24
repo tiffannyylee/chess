@@ -37,16 +37,14 @@ public class GameService {
     }
     public void joinGame(String playerColor, int gameID, String authToken) throws DataAccessException {
         userService.verifyAuth(authToken);
-        //now i have authdata
+
         AuthData authData = dataAccess.getAuth(authToken);
         GameData gameData = dataAccess.getGame(gameID);
         if (gameData == null) {
-            throw new DataAccessException("Game not found");
+            throw new BadRequestException("Game not found");
         }
-        if (playerColor.equals("WHITE") && gameData.whiteUsername() != null) {
-            throw new DataAccessException("White player already joined");
-        } else if (playerColor.equals("BLACK") && gameData.blackUsername() != null) {
-            throw new DataAccessException("Black player already joined");
+        if (gameData.blackUsername()!=null && playerColor.equals("BLACK")){
+            throw new UserAlreadyExistsException("This game already has a user this color");
         }
         if (playerColor.equals("WHITE")) {
             gameData = gameData.withWhiteUsername(authData.username());

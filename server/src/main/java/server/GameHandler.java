@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.BadRequestException;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.GameData;
@@ -46,7 +47,10 @@ public class GameHandler {
         String authToken = request.headers("Authorization");
         JoinGameRequest joinGameRequest = serializer.fromJson(request.body(), JoinGameRequest.class);
         String playerColor = joinGameRequest.playerColor();
-        int gameId = joinGameRequest.gameId();
+        int gameId = joinGameRequest.gameID();
+        if (playerColor == null){
+            throw new BadRequestException("player color is null");
+        }
         gameService.joinGame(playerColor, gameId, authToken);
         response.status(200);
         return "";
