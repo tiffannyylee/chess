@@ -2,7 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.BadRequestException;
-import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.GameData;
 import requests.CreateGameRequest;

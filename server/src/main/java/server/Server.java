@@ -1,15 +1,11 @@
 package server;
 
-import com.google.gson.Gson;
 import dataaccess.*;
-import model.UserData;
-import server.UserHandler;
 import service.GameService;
 import service.UserService;
 import spark.*;
 
 public class Server {
-    private final Gson serializer = new Gson();
     private final DataAccess dataAccess = new MemoryDataAccess();
     private final UserService service= new UserService(dataAccess);
     private final GameService gameService = new GameService(service, dataAccess);
@@ -49,12 +45,11 @@ public class Server {
     }
 
     private void exceptionHandler(Exception e, Request request, Response response) {
-        e.printStackTrace(); // This will print the full stack trace to the server logs
         if (e instanceof UserAlreadyExistsException) {
             response.status(403);
         } else if (e instanceof BadRequestException) {
             response.status(400);
-        } else if (e instanceof UnauthorizedException){
+        } else if (e instanceof UnauthorizedException) {
             response.status(401);
         } else {
             response.status(500);
