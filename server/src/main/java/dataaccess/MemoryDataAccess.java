@@ -65,7 +65,7 @@ public class MemoryDataAccess implements DataAccess{
 
         int gameID = games.size()+1;
         ChessGame game = new ChessGame();
-        GameData gameData = new GameData(gameID, authData.username(), null, gameName, game);
+        GameData gameData = new GameData(gameID, null, null, gameName, game);
         games.put(gameID, gameData);
 
         return gameData;
