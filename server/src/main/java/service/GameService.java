@@ -19,10 +19,8 @@ public class GameService {
     public List<GameData> listGames(String authToken) throws DataAccessException {
         userService.verifyAuth(authToken);
 
-        // Step 2: Retrieve the list of games from the database
         List<GameData> games = dataAccess.getGames();
 
-        // Step 3: Return the list of games
         return games;
     }
     public GameData createGame(String gameName, String authToken){
