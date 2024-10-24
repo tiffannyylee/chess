@@ -43,7 +43,7 @@ public class GameService {
         if (gameData == null) {
             throw new BadRequestException("Game not found");
         }
-        if (gameData.blackUsername()!=null && playerColor.equals("BLACK")){
+        if (gameData.whiteUsername()!=null && playerColor.equals("WHITE")||gameData.blackUsername()!=null && playerColor.equals("BLACK")){
             throw new UserAlreadyExistsException("This game already has a user this color");
         }
         if (playerColor.equals("WHITE")) {

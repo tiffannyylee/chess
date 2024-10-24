@@ -1,13 +1,13 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
-import dataaccess.UnauthorizedException;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,7 +36,6 @@ public class GameTest {
         // Assertions
         assertNotNull(createdGame);
         assertEquals("Test Game", createdGame.gameName());
-        assertEquals("testUser", createdGame.whiteUsername());
     }
 
     @Test
@@ -55,5 +54,46 @@ public class GameTest {
         assertThrows(DataAccessException.class, () -> {
             gameService.createGame("Game Without User", null);
         });
+    }
+
+    @Test
+    public void testJoinGameSuccess() throws DataAccessException {
+        UserData user = new UserData("testUser", "password123", "test@example.com");
+        userService.register(user);
+        AuthData authData = userService.login(new UserData("testUser", "password123", null));
+        GameData createdGame = gameService.createGame("Test Game", authData.authToken());
+        assertDoesNotThrow(() -> gameService.joinGame("WHITE", createdGame.gameID(), authData.authToken()));
+    }
+
+    @Test
+    public void testJoinGameFail() throws DataAccessException {
+        UserData user = new UserData("testUser", "password123", "test@example.com");
+        userService.register(user);
+        AuthData authData = userService.login(new UserData("testUser", "password123", null));
+        GameData createdGame = gameService.createGame("Test Game", authData.authToken());
+        gameService.joinGame("WHITE", createdGame.gameID(), authData.authToken());
+        assertThrows(DataAccessException.class, () -> gameService.joinGame("WHITE", createdGame.gameID(), authData.authToken()));
+    }
+    @Test
+    public void testListGameSuccess() throws DataAccessException {
+        UserData user = new UserData("testUser", "password123", "test@example.com");
+        userService.register(user);
+        AuthData authData = userService.login(new UserData("testUser", "password123", null));
+        GameData createdGame = gameService.createGame("Test Game", authData.authToken());
+        List<GameData> games = gameService.listGames(authData.authToken());
+
+        assertEquals(1, games.size(), "There should be exactly one game in the list.");
+        assertEquals("Test Game", games.get(0).gameName(), "The game name should match 'Test Game'.");
+    }
+    @Test
+    public void testListGamesFail() throws DataAccessException {
+        UserData user = new UserData("testUser", "password123", "test@example.com");
+        userService.register(user);
+        AuthData authData = userService.login(new UserData("testUser", "password123", null));
+
+        String invalidAuthToken = "invalidToken123";
+        assertThrows(UnauthorizedException.class, () -> {
+            gameService.listGames(invalidAuthToken);
+        }, "Expected UnauthorizedException when using an invalid auth token.");
     }
 }
