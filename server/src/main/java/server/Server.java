@@ -6,33 +6,41 @@ import service.UserService;
 import spark.*;
 
 public class Server {
-    private final DataAccess dataAccess = new MemoryDataAccess();
-    private final UserService service= new UserService(dataAccess);
+    private DataAccess dataAccess;
+    private final UserService service = new UserService(dataAccess);
     private final GameService gameService = new GameService(service, dataAccess);
     private final UserHandler userHandler = new UserHandler(service);
     private final GameHandler gameHandler = new GameHandler(service, gameService);
 
 
     public int run(int desiredPort) {
-        Spark.port(desiredPort);
+        try {
+            dataAccess = new MySQLDataAccess();
 
-        Spark.staticFiles.location("web");
+            Spark.port(desiredPort);
 
-        // Register your endpoints and handle exceptions here.
-        Spark.post("/user", (userHandler::createUser));
-        Spark.post("/session", (userHandler::loginUser));
-        Spark.post("/game", (gameHandler::createGame));
-        Spark.delete("/session", (userHandler::logoutUser));
-        Spark.delete("/db", this::clearDatabase);
-        Spark.get("/game",(gameHandler::listGames));
-        Spark.put("/game", (gameHandler::joinGame));
-        Spark.exception(Exception.class, this::exceptionHandler);
-        //This line initializes the server and can be removed once you have a functioning endpoint
-        Spark.init();
+            Spark.staticFiles.location("web");
 
-        Spark.awaitInitialization();
+            // Register your endpoints and handle exceptions here.
+            Spark.post("/user", (userHandler::createUser));
+            Spark.post("/session", (userHandler::loginUser));
+            Spark.post("/game", (gameHandler::createGame));
+            Spark.delete("/session", (userHandler::logoutUser));
+            Spark.delete("/db", this::clearDatabase);
+            Spark.get("/game", (gameHandler::listGames));
+            Spark.put("/game", (gameHandler::joinGame));
+            Spark.exception(Exception.class, this::exceptionHandler);
+            //This line initializes the server and can be removed once you have a functioning endpoint
+            Spark.init();
+
+            Spark.awaitInitialization();
+
+        } catch (Exception e) {
+            System.out.println("Can not connect to database");
+        }
         return Spark.port();
     }
+
     private Object clearDatabase(Request request, Response response) {
         try {
             dataAccess.clear();
