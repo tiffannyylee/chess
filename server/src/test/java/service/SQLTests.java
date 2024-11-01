@@ -88,7 +88,8 @@ public class SQLTests {
     public void testGetUserBadAuth() throws DataAccessException {
         UserData newUser = new UserData("tiff", "password", "tiff@email");
         dataAccess.createUser(newUser);
-        assertThrows(DataAccessException.class, () -> dataAccess.getUser("bad"));
+        UserData result = dataAccess.getUser("bad");
+        assertNull(result, "Expected null when retrieving a non-existent user");
     }
 
     @Test
@@ -284,7 +285,7 @@ public class SQLTests {
 
         dataAccess.clear();
 
-        assertThrows(DataAccessException.class, () -> dataAccess.getUser("tiff"), "User should not exist after clear");
+        assertNull(dataAccess.getUser("tiff"), "User should not exist after clear");
 
         assertTrue(dataAccess.getGames().isEmpty(), "Games table should be empty after clear");
     }
