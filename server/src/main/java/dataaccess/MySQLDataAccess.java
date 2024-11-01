@@ -215,6 +215,18 @@ public class MySQLDataAccess implements DataAccess {
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
+        String checkQuery = "SELECT COUNT(*) FROM Games WHERE gameID=?";
+        try (var conn = DatabaseManager.getConnection();
+             var checkStmt = conn.prepareStatement(checkQuery)) {
+            checkStmt.setInt(1, gameData.gameID());
+            try (var rs = checkStmt.executeQuery()) {
+                if (rs.next() && rs.getInt(1) == 0) {
+                    throw new DataAccessException("Game with ID " + gameData.gameID() + " does not exist.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to check game existence", e);
+        }
         String query = "UPDATE Games SET whiteUsername=?, blackUsername=?, gameName=? WHERE gameID=?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(query)) {
