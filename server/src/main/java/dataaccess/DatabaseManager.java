@@ -79,16 +79,5 @@ public class DatabaseManager {
             }
         }
     }
-
-    public static void main(String[] args) {
-        try {
-            createDatabase(); // Ensure the database is created if it doesn't exist
-            try (Connection conn = getConnection()) {
-                System.out.println("Connection successful!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Connection failed: " + e.getMessage());
-        }
-    }
+    
 }
