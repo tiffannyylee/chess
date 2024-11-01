@@ -12,13 +12,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {
-    private MySQLDataAccess dataAccess;
+    private MemoryDataAccess dataAccess;
     private UserService userService;
     private GameService gameService;
 
     @BeforeEach
     public void setup() {
-        dataAccess = new MySQLDataAccess();
+        dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(userService, dataAccess);
     }
@@ -93,7 +93,7 @@ public class GameTest {
         userService.register(user);
         AuthData authData = userService.login(new UserData("testUser", "password123", null));
 
-        String invalidAuthToken = "invalidToken123";
+        String invalidAuthToken = "invalidToken12345";
         assertThrows(UnauthorizedException.class, () -> {
             gameService.listGames(invalidAuthToken);
         }, "Expected UnauthorizedException when using an invalid auth token.");
