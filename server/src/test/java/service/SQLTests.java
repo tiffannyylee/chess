@@ -224,15 +224,10 @@ public class SQLTests {
     }
 
     @Test
-    void testGetGame_NonExistentGame() {
+    void testGetGame_NonExistentGame() throws DataAccessException {
         int invalidGameId = 999999;
 
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            dataAccess.getGame(invalidGameId);
-        });
-
-        assertTrue(exception.getMessage().contains("Game not found"),
-                "Exception message should indicate the game was not found");
+        assertNull(dataAccess.getGame(invalidGameId), "game is null");
     }
 
     @Test
