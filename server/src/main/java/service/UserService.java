@@ -20,7 +20,8 @@ public class UserService {
         if (dataAccess.getUser(newUser.username()) != null) {
             throw new UserAlreadyExistsException("Error: already taken");
         }
-        BCrypt.hashpw(newUser.password(), BCrypt.gensalt());
+        String hashedPassword = BCrypt.hashpw(newUser.password(), BCrypt.gensalt());
+        newUser = new UserData(newUser.username(), hashedPassword, newUser.email()); // replace password with hashed version
         dataAccess.createUser(newUser);
         return dataAccess.createAuth(newUser.username());
     }

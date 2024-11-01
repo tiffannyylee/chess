@@ -12,15 +12,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {
-    private MemoryDataAccess memoryDataAccess;
+    private MySQLDataAccess dataAccess;
     private UserService userService;
     private GameService gameService;
 
     @BeforeEach
     public void setup() {
-        memoryDataAccess = new MemoryDataAccess();
-        userService = new UserService(memoryDataAccess);
-        gameService = new GameService(userService, memoryDataAccess);
+        dataAccess = new MySQLDataAccess();
+        userService = new UserService(dataAccess);
+        gameService = new GameService(userService, dataAccess);
     }
 
     @Test
@@ -74,6 +74,7 @@ public class GameTest {
         gameService.joinGame("WHITE", createdGame.gameID(), authData.authToken());
         assertThrows(DataAccessException.class, () -> gameService.joinGame("WHITE", createdGame.gameID(), authData.authToken()));
     }
+
     @Test
     public void testListGameSuccess() throws DataAccessException {
         UserData user = new UserData("testUser", "password123", "test@example.com");
@@ -85,6 +86,7 @@ public class GameTest {
         assertEquals(1, games.size(), "There should be exactly one game in the list.");
         assertEquals("Test Game", games.get(0).gameName(), "The game name should match 'Test Game'.");
     }
+
     @Test
     public void testListGamesFail() throws DataAccessException {
         UserData user = new UserData("testUser", "password123", "test@example.com");

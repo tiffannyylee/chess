@@ -30,8 +30,8 @@ public class MySQLDataAccess implements DataAccess {
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(query)) {
             stmt.setString(1, userData.username());
-            stmt.setString(2, BCrypt.hashpw(userData.password(), BCrypt.gensalt()));
-            //stmt.setString(2, userData.password());
+            //stmt.setString(2, BCrypt.hashpw(userData.password(), BCrypt.gensalt()));
+            stmt.setString(2, userData.password());
             stmt.setString(3, userData.email());
             stmt.executeUpdate();
             return userData;
