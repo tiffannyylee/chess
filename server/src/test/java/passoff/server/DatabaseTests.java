@@ -25,6 +25,7 @@ public class DatabaseTests {
     @BeforeAll
     public static void startServer() {
         server = new Server();
+
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 
