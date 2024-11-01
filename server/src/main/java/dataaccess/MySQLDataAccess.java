@@ -87,7 +87,7 @@ public class MySQLDataAccess implements DataAccess {
                     String username = rs.getString("username");
                     return new AuthData(authToken, username);
                 } else {
-                    throw new DataAccessException("Auth not found");
+                    throw new UnauthorizedException("Auth not found");
                 }
             }
         } catch (SQLException e) {
@@ -210,7 +210,7 @@ public class MySQLDataAccess implements DataAccess {
                     ChessGame game = gson.fromJson(gameJson, ChessGame.class);
                     return new GameData(gameId, whiteUsername, blackUsername, gameName, game);
                 } else {
-                    throw new DataAccessException("Game not found");
+                    return null;
                 }
             }
         } catch (SQLException e) {
