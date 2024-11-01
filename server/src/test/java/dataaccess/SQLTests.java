@@ -1,16 +1,13 @@
-package service;
+package dataaccess;
 
 import chess.ChessGame;
-import dataaccess.DataAccess;
-import dataaccess.DatabaseManager;
-import dataaccess.DataAccessException;
-import dataaccess.MySQLDataAccess;
-import dataaccess.UserAlreadyExistsException;
 import model.AuthData;
 import model.UserData;
 import model.GameData;
 import org.junit.jupiter.api.*;
 import server.Server;
+import service.GameService;
+import service.UserService;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,7 +22,7 @@ public class SQLTests {
     private static Server server;
 
     @BeforeEach
-    public void setup() throws DataAccessException, SQLException {
+    void setup() throws DataAccessException, SQLException {
         dropTables(); // Drop tables before each test
         dataAccess = new MySQLDataAccess();
         userService = new UserService(dataAccess);
@@ -45,7 +42,7 @@ public class SQLTests {
 
 
     @BeforeAll
-    public static void startServer() {
+    static void startServer() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
@@ -57,7 +54,7 @@ public class SQLTests {
     }
 
     @AfterEach
-    public void cleanup() throws SQLException {
+    void cleanup() throws SQLException {
         dropTables(); // Clean up after each test
     }
 
@@ -88,7 +85,8 @@ public class SQLTests {
     public void testGetUserBadAuth() throws DataAccessException {
         UserData newUser = new UserData("tiff", "password", "tiff@email");
         dataAccess.createUser(newUser);
-        assertThrows(DataAccessException.class, () -> dataAccess.getUser("bad"));
+        UserData result = dataAccess.getUser("bad");
+        assertNull(result, "Expected null when retrieving a non-existent user");
     }
 
     @Test
@@ -108,7 +106,7 @@ public class SQLTests {
     }
 
     @Test
-    void testGetAuth_Positive() throws DataAccessException {
+    void testGetAuthPositive() throws DataAccessException {
         String username = "testUser";
         UserData user = new UserData(username, "password123", "test@example.com");
         dataAccess.createUser(user);
@@ -122,7 +120,7 @@ public class SQLTests {
     }
 
     @Test
-    void testGetAuth_AuthTokenNotFound() {
+    void testGetAuthAuthTokenNotFound() {
         String invalidAuthToken = "nonexistentToken";
 
         assertThrows(DataAccessException.class, () -> {
@@ -131,7 +129,7 @@ public class SQLTests {
     }
 
     @Test
-    void testDeleteAuth_Positive() throws DataAccessException {
+    void testDeleteAuthPositive() throws DataAccessException {
         String username = "testUser";
         UserData user = new UserData(username, "password123", "test@example.com");
         dataAccess.createUser(user);
@@ -145,7 +143,7 @@ public class SQLTests {
     }
 
     @Test
-    void testDeleteAuth_AuthTokenNotFound() {
+    void testDeleteAuthAuthTokenNotFound() {
         String invalidAuthToken = "nonexistentToken";
 
         assertThrows(DataAccessException.class, () -> {
@@ -154,7 +152,7 @@ public class SQLTests {
     }
 
     @Test
-    void testGetGames_Positive() throws DataAccessException {
+    void testGetGamesPositive() throws DataAccessException {
         String authToken = dataAccess.createAuth("player1").authToken();
         GameData game1 = dataAccess.createGame("Game 1", authToken);
         GameData game2 = dataAccess.createGame("Game 2", authToken);
@@ -171,7 +169,7 @@ public class SQLTests {
     }
 
     @Test
-    void testGetGames_NoGamesFound() throws DataAccessException {
+    void testGetGamesNoGamesFound() throws DataAccessException {
         dataAccess.clear();
 
         List<GameData> games = dataAccess.getGames();
@@ -181,7 +179,7 @@ public class SQLTests {
     }
 
     @Test
-    void testCreateGame_Positive() throws DataAccessException {
+    void testCreateGamePositive() throws DataAccessException {
         AuthData authData = dataAccess.createAuth("player1");
         String authToken = authData.authToken();
         String gameName = "Test Game";
@@ -196,7 +194,7 @@ public class SQLTests {
     }
 
     @Test
-    void testCreateGame_InvalidAuthToken() {
+    void testCreateGameInvalidAuthToken() {
         String invalidAuthToken = "invalid-token";
         String gameName = "Invalid Test Game";
 
@@ -209,7 +207,7 @@ public class SQLTests {
     }
 
     @Test
-    void testGetGame_Positive() throws DataAccessException {
+    void testGetGamePositive() throws DataAccessException {
         AuthData authData = dataAccess.createAuth("player1");
         String authToken = authData.authToken();
         GameData createdGame = dataAccess.createGame("Positive Test Game", authToken);
@@ -223,19 +221,14 @@ public class SQLTests {
     }
 
     @Test
-    void testGetGame_NonExistentGame() {
+    void testGetGameNonExistentGame() throws DataAccessException {
         int invalidGameId = 999999;
 
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            dataAccess.getGame(invalidGameId);
-        });
-
-        assertTrue(exception.getMessage().contains("Game not found"),
-                "Exception message should indicate the game was not found");
+        assertNull(dataAccess.getGame(invalidGameId), "game is null");
     }
 
     @Test
-    void testUpdateGame_Positive() throws DataAccessException {
+    void testUpdateGamePositive() throws DataAccessException {
         AuthData authData = dataAccess.createAuth("player1");
         String authToken = authData.authToken();
         GameData createdGame = dataAccess.createGame("Update Test Game", authToken);
@@ -258,7 +251,7 @@ public class SQLTests {
     }
 
     @Test
-    void testUpdateGame_InvalidGameID() {
+    void testUpdateGameInvalidGameID() {
         // Arrange: Create a game data object with a non-existent game ID
         GameData nonExistentGame = new GameData(
                 999999,              // Non-existent game ID
@@ -284,18 +277,11 @@ public class SQLTests {
 
         dataAccess.clear();
 
-        assertThrows(DataAccessException.class, () -> dataAccess.getUser("tiff"), "User should not exist after clear");
+        assertNull(dataAccess.getUser("tiff"), "User should not exist after clear");
 
         assertTrue(dataAccess.getGames().isEmpty(), "Games table should be empty after clear");
     }
 
-    @Test
-    public void testLoginSuccess() throws DataAccessException {
-        UserData newUser = new UserData("tiff", "password", "tiff@email");
-        dataAccess.createUser(newUser);
-        AuthData auth = userService.login(newUser);
-        assertNotNull(auth);
-    }
 
     @Test
     public void testLoginFailure() {
@@ -305,75 +291,4 @@ public class SQLTests {
         });
     }
 
-    @Test
-    public void testLogoutSuccess() throws DataAccessException {
-        UserData newUser = new UserData("tiff", "password", "tiff@email");
-        dataAccess.createUser(newUser);
-        AuthData auth = userService.login(newUser);
-        userService.logout(auth);
-        assertThrows(DataAccessException.class, () -> {
-            dataAccess.getAuth(auth.authToken()); // Should throw exception
-        });
-    }
-
-    @Test
-    public void testCreateGameSuccess() throws DataAccessException {
-        UserData newUser = new UserData("tiff", "password", "tiff@email");
-        dataAccess.createUser(newUser);
-        AuthData auth = userService.login(newUser);
-        GameData game = gameService.createGame("Test Game", auth.authToken());
-        assertNotNull(game);
-        assertEquals("Test Game", game.gameName());
-    }
-
-    @Test
-    public void testListGamesSuccess() throws DataAccessException {
-        UserData newUser = new UserData("tiff", "password", "tiff@email");
-        dataAccess.createUser(newUser);
-        AuthData auth = userService.login(newUser);
-        gameService.createGame("Test Game", auth.authToken());
-
-        List<GameData> games = gameService.listGames(auth.authToken());
-        assertNotEquals(0, games.size());
-    }
-
-    @Test
-    public void testJoinGameSuccess() throws DataAccessException {
-        UserData newUser = new UserData("tiff", "password", "tiff@email");
-        dataAccess.createUser(newUser);
-        AuthData auth = userService.login(newUser);
-        GameData game = gameService.createGame("Test Game", auth.authToken());
-
-        gameService.joinGame("WHITE", game.gameID(), auth.authToken());
-        GameData updatedGame = dataAccess.getGame(game.gameID());
-        assertEquals(newUser.username(), updatedGame.whiteUsername());
-    }
-
-    @Test
-    public void testJoinGameFailureGameNotFound() throws DataAccessException {
-        UserData newUser = new UserData("tiff", "password", "tiff@email");
-        dataAccess.createUser(newUser);
-        AuthData auth = userService.login(newUser);
-        assertThrows(DataAccessException.class, () -> {
-            gameService.joinGame("WHITE", 999, auth.authToken()); // Invalid game ID
-        });
-    }
-
-    @Test
-    public void testJoinGameFailureUserAlreadyExists() throws DataAccessException {
-        UserData user1 = new UserData("tiff", "password", "tiff@email");
-        UserData user2 = new UserData("john", "password", "john@email");
-        dataAccess.createUser(user1);
-        dataAccess.createUser(user2);
-
-        AuthData auth1 = userService.login(user1);
-        GameData game = gameService.createGame("Test Game", auth1.authToken());
-
-        gameService.joinGame("WHITE", game.gameID(), auth1.authToken()); // User1 joins
-
-        AuthData auth2 = userService.login(user2);
-        assertThrows(UserAlreadyExistsException.class, () -> {
-            gameService.joinGame("WHITE", game.gameID(), auth2.authToken()); // User2 tries to join
-        });
-    }
 }

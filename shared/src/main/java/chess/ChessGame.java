@@ -14,6 +14,7 @@ import java.util.Objects;
 public class ChessGame {
     private ChessGame.TeamColor currentTeamColor;
     private ChessBoard currentBoard;
+
     public ChessGame() {
         currentTeamColor = TeamColor.WHITE;
         currentBoard = new ChessBoard();
@@ -54,14 +55,14 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece piece = currentBoard.getPiece(startPosition);
-        if(piece == null){
+        if (piece == null) {
             return null;
         }
         Collection<ChessMove> moves = piece.pieceMoves(currentBoard, startPosition);
         for (ChessMove move : moves) {
             ChessBoard originalBoardState = currentBoard.copy();
             simulateMove(startPosition, move.getEndPosition());
-            if (!isInCheck(piece.getTeamColor())){
+            if (!isInCheck(piece.getTeamColor())) {
                 validMoves.add(move);
             }
             currentBoard = originalBoardState;
@@ -72,7 +73,7 @@ public class ChessGame {
     private void simulateMove(ChessPosition moveFrom, ChessPosition moveTo) {
         ChessPiece pieceToMove = currentBoard.getPiece(moveFrom);
         // Move the piece on the board
-        if(pieceToMove!=null){
+        if (pieceToMove != null) {
             currentBoard.addPiece(moveTo, pieceToMove);
             currentBoard.addPiece(moveFrom, null);
         }
@@ -88,13 +89,13 @@ public class ChessGame {
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         ChessPiece pieceToMove = currentBoard.getPiece(move.getStartPosition());
 
-        if (pieceToMove == null|| pieceToMove.getTeamColor() != currentTeamColor) {
+        if (pieceToMove == null || pieceToMove.getTeamColor() != currentTeamColor) {
             throw new InvalidMoveException();
         }
         for (ChessMove validMove : validMoves) {
-            if (move.equals(validMove)){
+            if (move.equals(validMove)) {
                 //check if there is a promo piece and replace pawn if there is
-                if (move.getPromotionPiece()!=null){
+                if (move.getPromotionPiece() != null) {
                     pieceToMove = new ChessPiece(pieceToMove.getTeamColor(), move.getPromotionPiece());
                 }
                 currentBoard.addPiece(validMove.getEndPosition(), pieceToMove);
@@ -146,18 +147,19 @@ public class ChessGame {
         return false;
     }
 
-    private ChessPosition findKingPos(TeamColor team){
-        for (int row = 0; row<8; row++){
-            for (int col = 0; col<8; col++){
-                ChessPosition position = new ChessPosition(row+1, col+1); //i changed this to plus one bc get piece goes out of bounds
+    private ChessPosition findKingPos(TeamColor team) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPosition position = new ChessPosition(row + 1, col + 1); //i changed this to plus one bc get piece goes out of bounds
                 ChessPiece currPiece = currentBoard.getPiece(position);
-                if (currPiece!=null && currPiece.getPieceType()== ChessPiece.PieceType.KING&&currPiece.getTeamColor()==team){
+                if (currPiece != null && currPiece.getPieceType() == ChessPiece.PieceType.KING && currPiece.getTeamColor() == team) {
                     return position;
                 }
             }
         }
         return null;
     }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -172,7 +174,7 @@ public class ChessGame {
         // Check if any move can get the team out of check
         for (ChessPosition position : getTeamPiecePositions(teamColor)) {
             ChessPiece pieceAtPos = currentBoard.getPiece(position);
-            if (canEscapeCheck(pieceAtPos, position, teamColor)) {
+            if (canMakeValidMove(pieceAtPos, position, teamColor)) {
                 return false; // A move exists that gets the team out of check
             }
         }
@@ -191,16 +193,6 @@ public class ChessGame {
             }
         }
         return positions;
-    }
-
-    private boolean canEscapeCheck(ChessPiece piece, ChessPosition position, TeamColor teamColor) {
-        Collection<ChessMove> possibleMoves = piece.pieceMoves(currentBoard, position);
-        for (ChessMove move : possibleMoves) {
-            if (isSafeMove(position, move.getEndPosition(), teamColor)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private boolean isSafeMove(ChessPosition startPos, ChessPosition endPos, TeamColor teamColor) {
@@ -245,7 +237,6 @@ public class ChessGame {
     }
 
 
-
     /**
      * Sets this game's chessboard with a given board
      *
@@ -274,10 +265,10 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o){
+        if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()){
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
