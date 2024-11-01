@@ -6,7 +6,7 @@ import service.UserService;
 import spark.*;
 
 public class Server {
-    private DataAccess dataAccess;
+    private DataAccess dataAccess = new MySQLDataAccess();
     private final UserService service = new UserService(dataAccess);
     private final GameService gameService = new GameService(service, dataAccess);
     private final UserHandler userHandler = new UserHandler(service);
@@ -15,7 +15,6 @@ public class Server {
 
     public int run(int desiredPort) {
         try {
-            dataAccess = new MySQLDataAccess();
 
             Spark.port(desiredPort);
 

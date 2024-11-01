@@ -30,7 +30,6 @@ public class SQLTests {
         dataAccess = new MySQLDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(userService, dataAccess);
-
     }
 
     private void dropTables() throws SQLException {

@@ -15,8 +15,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class MySQLDataAccess implements DataAccess {
-    public MySQLDataAccess() throws DataAccessException {
-        configureDatabase();
+    public MySQLDataAccess() {
+        try {
+            configureDatabase();
+        } catch (DataAccessException e) {
+            System.out.println("can not connect");
+        }
     }
 
 
@@ -27,6 +31,7 @@ public class MySQLDataAccess implements DataAccess {
              var stmt = conn.prepareStatement(query)) {
             stmt.setString(1, userData.username());
             stmt.setString(2, BCrypt.hashpw(userData.password(), BCrypt.gensalt()));
+            //stmt.setString(2, userData.password());
             stmt.setString(3, userData.email());
             stmt.executeUpdate();
             return userData;
@@ -62,7 +67,7 @@ public class MySQLDataAccess implements DataAccess {
                     String email = rs.getString("email");
                     return new UserData(username, password, email);
                 } else {
-                    throw new DataAccessException("User not found");
+                    return null;
                 }
             }
         } catch (SQLException e) {
