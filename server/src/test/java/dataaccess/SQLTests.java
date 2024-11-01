@@ -1,16 +1,13 @@
-package service;
+package dataaccess;
 
 import chess.ChessGame;
-import dataaccess.DataAccess;
-import dataaccess.DatabaseManager;
-import dataaccess.DataAccessException;
-import dataaccess.MySQLDataAccess;
-import dataaccess.UserAlreadyExistsException;
 import model.AuthData;
 import model.UserData;
 import model.GameData;
 import org.junit.jupiter.api.*;
 import server.Server;
+import service.GameService;
+import service.UserService;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,7 +22,7 @@ public class SQLTests {
     private static Server server;
 
     @BeforeEach
-    public void setup() throws DataAccessException, SQLException {
+    void setup() throws DataAccessException, SQLException {
         dropTables(); // Drop tables before each test
         dataAccess = new MySQLDataAccess();
         userService = new UserService(dataAccess);
@@ -45,7 +42,7 @@ public class SQLTests {
 
 
     @BeforeAll
-    public static void startServer() {
+    static void startServer() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
@@ -57,7 +54,7 @@ public class SQLTests {
     }
 
     @AfterEach
-    public void cleanup() throws SQLException {
+    void cleanup() throws SQLException {
         dropTables(); // Clean up after each test
     }
 
