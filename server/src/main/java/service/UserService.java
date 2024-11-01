@@ -32,8 +32,8 @@ public class UserService {
         if (storedUser == null) {
             throw new UnauthorizedException("Error: unauthorized"); // Ensure this is thrown for non-existent users
         }
-        //BCrypt.checkpw(user.password(), storedUser.password());
-        if (!BCrypt.checkpw(user.password(), storedUser.password())) {
+        //CHANGED FROM (!user.password.equals(stored.User.password())
+        if (!BCrypt.checkpw(user.password(), storedUser.password())) { //REMEMBER YOU CHANGED THIS FOR SQL TESTS
             throw new UnauthorizedException("Error: unauthorized");
         }
         return dataAccess.createAuth(user.username());
