@@ -9,7 +9,7 @@ public class PreLoginClient {
     private final String serverUrl;
 
     public PreLoginClient(String serverUrl) {
-        server = new ServerFacade();
+        server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
     }
 }
