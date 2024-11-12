@@ -12,4 +12,12 @@ public class PreLoginClient {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
     }
+
+    public String help() {
+        return """
+                register <USERNAME> <PASSWORD> <EMAIL> - to register a user
+                login <USERNAME> <PASSWORD> - to log in
+                quit - to quit playing
+                help - to see all possible commands""";
+    }
 }

@@ -22,35 +22,40 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public AuthData register(UserData newUser) {
+    public AuthData register(UserData newUser) throws ResponseException {
         String path = "/user";
         return this.makeRequest("POST", path, newUser, AuthData.class);
     }
 
-    public AuthData login(UserData user) {
-
-        return null;
+    public AuthData login(UserData user) throws ResponseException {
+        String path = "/session";
+        return this.makeRequest("POST", path, user, AuthData.class);
     }
 
-    public void logout(AuthData auth) {
-
+    public void logout(AuthData auth) throws ResponseException {
+        String path = "/session";
+        this.makeRequest("DELETE", path, auth, null);
     }
 
-    public GameData createGame(String gameName, String authToken) {
-
-        return null;
+    public GameData createGame(String gameName) throws ResponseException {
+        String path = "/game";
+        return this.makeRequest("POST", path, gameName, GameData.class);
     }
 
-    public void joinGame(String playerColor, int gameID, String authToken) {
+//    public void joinGame(String playerColor, int gameID, String authToken) {
+//
+//    }
 
+    public List<GameData> listGames() throws ResponseException {
+        String path = "/game";
+        record listGamesResponse(List<GameData> gameData) {
+        }
+        var response = this.makeRequest("GET", path, null, listGamesResponse.class);
+        assert response != null;
+        return response.gameData();
     }
 
-    public List<GameData> listGames(String authToken) {
-
-        return List.of();
-    }
-
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -60,11 +65,11 @@ public class ServerFacade {
             writeBody(request, http);
             http.connect();
             throwIfNotSuccessful(http);
+            System.out.println("this was successful");
             return readBody(http, responseClass);
         } catch (Exception ex) {
-            System.out.println("oh no there is a problem");
+            throw new ResponseException(500, ex.getMessage());
         }
-        return null;
     }
 
     private <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
