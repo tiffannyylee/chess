@@ -24,22 +24,22 @@ public class ServerFacade {
 
     public AuthData register(UserData newUser) throws ResponseException {
         String path = "/user";
-        return this.makeRequest("POST", path, newUser, AuthData.class);
+        return this.makeRequest("POST", path, newUser, AuthData.class, null);
     }
 
     public AuthData login(UserData user) throws ResponseException {
         String path = "/session";
-        return this.makeRequest("POST", path, user, AuthData.class);
+        return this.makeRequest("POST", path, user, AuthData.class, null);
     }
 
     public void logout(AuthData auth) throws ResponseException {
         String path = "/session";
-        this.makeRequest("DELETE", path, auth, null);
+        this.makeRequest("DELETE", path, null, null, auth);
     }
 
-    public GameData createGame(String gameName) throws ResponseException {
+    public void createGame(String gameName, AuthData auth) throws ResponseException {
         String path = "/game";
-        return this.makeRequest("POST", path, gameName, GameData.class);
+        this.makeRequest("POST", path, gameName, null, auth);
     }
 
 //    public void joinGame(String playerColor, int gameID, String authToken) {
@@ -50,17 +50,20 @@ public class ServerFacade {
         String path = "/game";
         record listGamesResponse(List<GameData> gameData) {
         }
-        var response = this.makeRequest("GET", path, null, listGamesResponse.class);
+        var response = this.makeRequest("GET", path, null, listGamesResponse.class, null);
         assert response != null;
         return response.gameData();
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, AuthData auth) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+            if (auth != null && auth.authToken() != null) {
+                http.setRequestProperty("Authorization", auth.authToken());
+            }
 
             writeBody(request, http);
             http.connect();
@@ -87,9 +90,15 @@ public class ServerFacade {
 
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
-        var status = http.getResponseCode();
+        int status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            throw new ResponseException(status, "failure: " + status);
+            String errorMsg = "failure: " + status;
+            try (InputStream errorStream = http.getErrorStream()) {
+                if (errorStream != null) {
+                    errorMsg += " - " + new String(errorStream.readAllBytes());
+                }
+            }
+            throw new ResponseException(status, errorMsg);
         }
     }
 
