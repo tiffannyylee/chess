@@ -31,7 +31,7 @@ public class PreLoginClient {
                 case "create" -> createGame(parameters);
                 case "list" -> listGames();
                 case "observe" -> observeGame();
-                case "play" -> playGame();
+                case "play" -> playGame(parameters);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -41,8 +41,14 @@ public class PreLoginClient {
 
     }
 
-    private String playGame() {
-        return "";
+    private String playGame(String... parameters) {
+        if (parameters.length < 2) {
+            return "Error: You must specify the game number and the color (e.g., '1' 'WHITE').";
+        }
+
+        String id = parameters[0];
+        String color = parameters[1];
+        server.joinGame(authData, color, id);
     }
 
     private String observeGame() {
@@ -56,8 +62,6 @@ public class PreLoginClient {
             String gameName = game.gameName();
             String whitePlayer = game.whiteUsername() != null ? game.whiteUsername() : "TBD";
             String blackPlayer = game.blackUsername() != null ? game.blackUsername() : "TBD";
-
-            // Format each game's display
             display.append(String.format("%d. Game Name: %s | Players: %s vs %s\n", count, gameName, whitePlayer, blackPlayer));
             count++;
         }
