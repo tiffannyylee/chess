@@ -32,14 +32,17 @@ public class BoardUI {
             {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK}
     };
 
-
-    public static void drawChessBoardWhite(PrintStream out) {
-        // Column headers at the top
+    public static void drawColumnHeaders(PrintStream out) {
         out.print("    ");
         for (char col = 'a'; col < 'i'; col++) {
             out.printf("  %c  ", col);
         }
         out.println();
+    }
+
+
+    public static void drawChessBoard(PrintStream out, String[][] board) {
+        drawColumnHeaders(out);
 
         // Draw each row of the board with increased square height
         for (int row = 0; row < BOARD_SIZE; row++) {
@@ -57,7 +60,7 @@ public class BoardUI {
                     String color = (row + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
 
                     if (h == SQUARE_HEIGHT / 2) {  // Middle row to display piece
-                        out.print(color + initialBoard[row][col] + EMPTY_SQUARE + RESET_COLOR);
+                        out.print(color + board[row][col] + EMPTY_SQUARE + RESET_COLOR);
                     } else {  // Empty padding rows for height
                         out.print(color + "     " + RESET_COLOR);
                     }
@@ -71,16 +74,12 @@ public class BoardUI {
             }
         }
 
-        // Column headers at the bottom
-        out.print("    ");
-        for (char col = 'a'; col < 'i'; col++) {
-            out.printf("  %c  ", col);
-        }
-        out.println();
+        drawColumnHeaders(out);
     }
 
     public static void main(String[] args) {
         var out = new PrintStream(System.out);
-        drawChessBoardWhite(out);
+        drawChessBoard(out, initialBoardBlack); //black board
+        drawChessBoard(out, initialBoardWhite); //white board
     }
 }
