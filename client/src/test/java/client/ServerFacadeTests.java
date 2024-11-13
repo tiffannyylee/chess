@@ -19,7 +19,7 @@ public class ServerFacadeTests {
 
     private static Server server;
     static ServerFacade facade;
-    //static DataAccess dataAccess;
+    static DataAccess dataAccess;
 
 
     @BeforeAll
@@ -28,18 +28,17 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade("http://localhost:" + port);
-        //dataAccess = new MySQLDataAccess();
+        dataAccess = new MySQLDataAccess();
     }
 
-//    @BeforeEach
-//    void clearServer() {
-//        try {
-//            dataAccess.clear();
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//    }
+    @BeforeEach
+    void clearServer() {
+        try {
+            dataAccess.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @AfterAll
     static void stopServer() {
@@ -61,7 +60,7 @@ public class ServerFacadeTests {
 
     @Test
     void registerFail() throws Exception {
-        UserData user = new UserData("player1", "password", "");
+        UserData user = new UserData("player1", "password", null);
         assertThrows(ResponseException.class, () -> facade.register(user));
     }
 
