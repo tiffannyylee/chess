@@ -1,21 +1,23 @@
 import java.io.PrintStream;
 
+import static ui.EscapeSequences.*;
+
 public class BoardUI {
     private static final int BOARD_SIZE = 8;
     private static final String EMPTY_SQUARE = "   "; // width of square
-    private static final String LIGHT_COLOR = "\u001B[47m"; // Light background
-    private static final String DARK_COLOR = "\u001B[42m"; // Dark background
+    private static final String LIGHT_COLOR = SET_BG_COLOR_LIGHT_GREY; // Light background
+    private static final String DARK_COLOR = SET_BG_COLOR_BLUE; // Dark background
     private static final String RESET_COLOR = "\u001B[0m";
 
     private static final String[][] initialBoard = {
-            {" R ", " N ", " B ", " Q ", " K ", " B ", " N ", " R "},
-            {" P ", " P ", " P ", " P ", " P ", " P ", " P ", " P "},
+            {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK},
+            {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
             {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
             {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
             {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
             {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
-            {" p ", " p ", " p ", " p ", " p ", " p ", " p ", " p "},
-            {" r ", " n ", " b ", " q ", " k ", " b ", " n ", " r "}
+            {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN},
+            {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}
     };
 
     public static void drawChessBoard(PrintStream out) {
