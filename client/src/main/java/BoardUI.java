@@ -10,7 +10,7 @@ public class BoardUI {
     private static final String DARK_COLOR = SET_BG_COLOR_BLACK;
     private static final String RESET_COLOR = "\u001B[0m";
 
-    private static final String[][] initialBoard = {
+    private static final String[][] initialBoardWhite = {
             {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK},
             {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
             {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
@@ -20,6 +20,18 @@ public class BoardUI {
             {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN},
             {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}
     };
+
+    private static final String[][] initialBoardBlack = {
+            {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK},
+            {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN},
+            {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
+            {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
+            {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
+            {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
+            {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
+            {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK}
+    };
+
 
     public static void drawChessBoardWhite(PrintStream out) {
         // Column headers at the top
