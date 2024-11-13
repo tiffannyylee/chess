@@ -109,16 +109,21 @@ public class PreLoginClient {
     }
 
     private String createGame(String... parameters) throws ResponseException {
-        assertLoggedIn();
-        if (parameters.length == 1) {
-            String gameName = parameters[0];
-            server.createGame(gameName, authData);
-        } else if (parameters.length < 1) {
-            throw new ResponseException(500, "game name is expected");
-        } else {
-            return "Please keep the name to one word!";
+        try {
+            assertLoggedIn();
+            if (parameters.length == 1) {
+                String gameName = parameters[0];
+                server.createGame(gameName, authData);
+            } else if (parameters.length < 1) {
+                throw new ResponseException(500, "game name is expected");
+            } else {
+                return "Please keep the name to one word!";
+            }
+            return String.format("%s has been created!", parameters[0]);
+        } catch (ResponseException e) {
+            return "Something went wrong. This game name may already exist. Try another.";
         }
-        return String.format("%s has been created!", parameters[0]);
+
     }
 
     private String logout() throws ResponseException {

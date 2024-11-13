@@ -23,18 +23,26 @@ public class GameService {
 
         return games;
     }
+
     public GameData createGame(String gameName, String authToken) throws DataAccessException {
         userService.verifyAuth(authToken);
         System.out.println("Using Auth Token: " + authToken);
 
-        AuthData authData = dataAccess.getAuth(authToken); //this is the problem line
+        AuthData authData = dataAccess.getAuth(authToken);
         System.out.println("Current Auth Data: " + authData);
 
-        if (authData == null){
+        if (authData == null) {
             throw new BadRequestException("this if from the auth");
         }
-        return dataAccess.createGame(gameName, authData.authToken()); //FIX THIS
+        List<GameData> games = dataAccess.getGames();
+        for (GameData game : games) {
+            if (game.gameName().equalsIgnoreCase(gameName)) {
+                throw new BadRequestException("A game with this name already exists");
+            }
+        }
+        return dataAccess.createGame(gameName, authData.authToken());
     }
+
     public void joinGame(String playerColor, int gameID, String authToken) throws DataAccessException {
         userService.verifyAuth(authToken);
 
@@ -43,7 +51,7 @@ public class GameService {
         if (gameData == null) {
             throw new BadRequestException("Game not found");
         }
-        if (gameData.whiteUsername()!=null && playerColor.equals("WHITE")||gameData.blackUsername()!=null && playerColor.equals("BLACK")){
+        if (gameData.whiteUsername() != null && playerColor.equals("WHITE") || gameData.blackUsername() != null && playerColor.equals("BLACK")) {
             throw new UserAlreadyExistsException("This game already has a user this color");
         }
         if (playerColor.equals("WHITE")) {

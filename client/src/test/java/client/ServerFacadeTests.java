@@ -6,12 +6,14 @@ import dataaccess.DatabaseManager;
 import dataaccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 import ServerFacade.ServerFacade;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -97,6 +99,22 @@ public class ServerFacadeTests {
         facade.logout(auth);
         assertThrows(ResponseException.class, () -> facade.logout(auth));
     }
-    
+
+    @Test
+    void createGameSuccess() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        AuthData auth = facade.register(user);
+        facade.createGame("game", auth);
+        List<GameData> games = dataAccess.getGames();
+        assertTrue(games.size() == 1);
+    }
+
+    @Test
+    void createGameFail() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        AuthData auth = facade.register(user);
+        facade.createGame("game", auth);
+        assertThrows(ResponseException.class, () -> facade.createGame("game", auth));
+    }
 
 }
