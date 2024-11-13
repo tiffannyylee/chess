@@ -4,7 +4,7 @@ import static ui.EscapeSequences.*;
 
 public class BoardUI {
     private static final int BOARD_SIZE = 8;
-    private static final int SQUARE_HEIGHT = 2;  // Height for each square to make it "square-like"
+    private static final int SQUARE_HEIGHT = 2;
     private static final String EMPTY_SQUARE = "  ";  // Width of each square
     private static final String LIGHT_COLOR = SET_BG_COLOR_LIGHT_GREY;
     private static final String DARK_COLOR = SET_BG_COLOR_BLACK;
@@ -44,9 +44,9 @@ public class BoardUI {
     public static void drawChessBoard(PrintStream out, String[][] board) {
         drawColumnHeaders(out);
 
-        // Draw each row of the board with increased square height
+        // Draw each row of the board
         for (int row = 0; row < BOARD_SIZE; row++) {
-            // Repeat each square row to create a square appearance
+            // Repeat each square row to create a square
             for (int h = 0; h < SQUARE_HEIGHT; h++) {
                 // Add row numbers on the left side only in the middle of the square height
                 if (h == SQUARE_HEIGHT / 2) {
@@ -77,9 +77,17 @@ public class BoardUI {
         drawColumnHeaders(out);
     }
 
+    public static void drawChessBoardWhite(PrintStream out) {
+        drawChessBoard(out, initialBoardWhite);
+    }
+
+    public static void drawChessBoardBlack(PrintStream out) {
+        drawChessBoard(out, initialBoardBlack);
+    }
+
     public static void main(String[] args) {
         var out = new PrintStream(System.out);
-        drawChessBoard(out, initialBoardBlack); //black board
-        drawChessBoard(out, initialBoardWhite); //white board
+        drawChessBoardBlack(out);
+        drawChessBoardWhite(out); //white board
     }
 }

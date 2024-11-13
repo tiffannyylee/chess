@@ -3,6 +3,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,7 +56,11 @@ public class PreLoginClient {
 
             // Call the server to join the game
             server.joinGame(authData, color, gameID);
-            return String.format("You have joined the game '%s' as %s!", selectedGame.gameName(), color);
+            String message = String.format("You have joined the game '%s' as %s!", selectedGame.gameName(), color);
+            var out = new PrintStream(System.out);
+            BoardUI.drawChessBoardBlack(out);
+            BoardUI.drawChessBoardWhite(out);
+            return message;
 
         } catch (NumberFormatException e) {
             return "Error: Invalid game number. Please enter a valid number.";
