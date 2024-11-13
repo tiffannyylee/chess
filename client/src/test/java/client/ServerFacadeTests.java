@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.MySQLDataAccess;
 import exception.ResponseException;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -12,8 +13,7 @@ import ServerFacade.ServerFacade;
 
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {
 
@@ -63,5 +63,40 @@ public class ServerFacadeTests {
         UserData user = new UserData("player1", "password", null);
         assertThrows(ResponseException.class, () -> facade.register(user));
     }
+
+    @Test
+    void loginSuccess() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        facade.register(user);
+        var authData = facade.login(user);
+        assertTrue(authData.authToken().length() > 5);
+    }
+
+    @Test
+    void loginFail() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        facade.register(user);
+        UserData unregistered = new UserData("tiff", "badpass", "tiff@byu.edu");
+        assertThrows(ResponseException.class, () -> facade.login(unregistered));
+    }
+
+    @Test
+    void logoutSuccess() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        facade.register(user);
+        AuthData auth = facade.login(user);
+        facade.logout(auth);
+        assertThrows(ResponseException.class, () -> facade.createGame("game", auth));
+    }
+
+    @Test
+    void logoutFail() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        facade.register(user);
+        AuthData auth = facade.login(user);
+        facade.logout(auth);
+        assertThrows(ResponseException.class, () -> facade.logout(auth));
+    }
+    
 
 }
