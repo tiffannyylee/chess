@@ -59,7 +59,7 @@ public class PreLoginClient {
         } else {
             throw new ResponseException(500, "game name is expected");
         }
-        return "%s has been created!";
+        return String.format("%s has been created!", parameters[0]);
     }
 
     private String logout() throws ResponseException {

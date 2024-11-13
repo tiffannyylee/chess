@@ -3,6 +3,7 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import requests.CreateGameRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +40,8 @@ public class ServerFacade {
 
     public void createGame(String gameName, AuthData auth) throws ResponseException {
         String path = "/game";
-        this.makeRequest("POST", path, gameName, null, auth);
+        CreateGameRequest request = new CreateGameRequest(gameName);
+        this.makeRequest("POST", path, request, GameData.class, auth);
     }
 
 //    public void joinGame(String playerColor, int gameID, String authToken) {
@@ -68,7 +70,6 @@ public class ServerFacade {
             writeBody(request, http);
             http.connect();
             throwIfNotSuccessful(http);
-            System.out.println("this was successful");
             return readBody(http, responseClass);
         } catch (Exception ex) {
             throw new ResponseException(500, ex.getMessage());
