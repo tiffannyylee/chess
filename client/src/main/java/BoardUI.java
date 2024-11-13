@@ -6,7 +6,7 @@ public class BoardUI {
     private static final int BOARD_SIZE = 8;
     private static final int SQUARE_HEIGHT = 2;  // Height for each square to make it "square-like"
     private static final String EMPTY_SQUARE = "  ";  // Width of each square
-    private static final String LIGHT_COLOR = SET_BG_COLOR_WHITE;
+    private static final String LIGHT_COLOR = SET_BG_COLOR_LIGHT_GREY;
     private static final String DARK_COLOR = SET_BG_COLOR_BLACK;
     private static final String RESET_COLOR = "\u001B[0m";
 
@@ -21,10 +21,10 @@ public class BoardUI {
             {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}
     };
 
-    public static void drawChessBoard(PrintStream out) {
+    public static void drawChessBoardWhite(PrintStream out) {
         // Column headers at the top
         out.print("    ");
-        for (char col = 'a'; col < 'a' + BOARD_SIZE; col++) {
+        for (char col = 'a'; col < 'i'; col++) {
             out.printf("  %c  ", col);
         }
         out.println();
@@ -51,7 +51,7 @@ public class BoardUI {
                     }
                 }
 
-                // Add row numbers on the right side only in the middle of the square height
+                // Add row numbers on the right side
                 if (h == SQUARE_HEIGHT / 2) {
                     out.printf("  %d", BOARD_SIZE - row);
                 }
@@ -61,7 +61,7 @@ public class BoardUI {
 
         // Column headers at the bottom
         out.print("    ");
-        for (char col = 'a'; col < 'a' + BOARD_SIZE; col++) {
+        for (char col = 'a'; col < 'i'; col++) {
             out.printf("  %c  ", col);
         }
         out.println();
@@ -69,6 +69,6 @@ public class BoardUI {
 
     public static void main(String[] args) {
         var out = new PrintStream(System.out);
-        drawChessBoard(out);
+        drawChessBoardWhite(out);
     }
 }
