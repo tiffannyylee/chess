@@ -4,6 +4,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import requests.CreateGameRequest;
+import requests.RegisterRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +26,8 @@ public class ServerFacade {
 
     public AuthData register(UserData newUser) throws ResponseException {
         String path = "/user";
-        return this.makeRequest("POST", path, newUser, AuthData.class, null);
+        RegisterRequest request = new RegisterRequest(newUser.username(), newUser.password(), newUser.email());
+        return this.makeRequest("POST", path, request, AuthData.class, null);
     }
 
     public AuthData login(UserData user) throws ResponseException {
