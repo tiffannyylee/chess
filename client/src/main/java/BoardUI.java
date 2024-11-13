@@ -7,7 +7,7 @@ public class BoardUI {
     private static final int SQUARE_HEIGHT = 2;
     private static final String EMPTY_SQUARE = "  ";  // Width of each square
     private static final String LIGHT_COLOR = SET_BG_COLOR_LIGHT_GREY;
-    private static final String DARK_COLOR = SET_BG_COLOR_BLACK;
+    private static final String DARK_COLOR = SET_BG_COLOR_RED;
     private static final String RESET_COLOR = "\u001B[0m";
 
     private static final String[][] initialBoardWhite = {

@@ -31,7 +31,7 @@ public class PreLoginClient {
                 case "logout" -> logout();
                 case "create" -> createGame(parameters);
                 case "list" -> listGames();
-                case "observe" -> observeGame();
+                case "observe" -> observeGame(parameters);
                 case "play" -> playGame(parameters);
                 case "quit" -> "quit";
                 default -> help();
@@ -71,8 +71,20 @@ public class PreLoginClient {
         }
     }
 
-    private String observeGame() {
-        return "";
+    private String observeGame(String... parameters) throws ResponseException {
+        List<GameData> gamesList = server.listGames(authData);
+        try {
+            int gameNumber = Integer.parseInt(parameters[0]); // Game number selected by the user
+            GameData selectedGame = gamesList.get(gameNumber - 1); // Adjust for zero-indexed list
+            int gameID = selectedGame.gameID(); // Get the ID of the selected game
+            String message = String.format("You are watching the game '%s'!", selectedGame.gameName());
+            var out = new PrintStream(System.out);
+            BoardUI.drawChessBoardBlack(out);
+            BoardUI.drawChessBoardWhite(out);
+            return message;
+        } catch (NumberFormatException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String listGamesDisplay(List<GameData> games) {

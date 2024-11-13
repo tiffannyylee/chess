@@ -50,7 +50,7 @@ public class ServerFacade {
     public void joinGame(AuthData auth, String playerColor, int gameID) throws ResponseException {
         String path = "/game";
         JoinGameRequest request = new JoinGameRequest(auth.authToken(), playerColor, gameID);
-        this.makeRequest("POST", path, request, null, auth);
+        this.makeRequest("PUT", path, request, null, auth);
     }
 
     public List<GameData> listGames(AuthData auth) throws ResponseException {
