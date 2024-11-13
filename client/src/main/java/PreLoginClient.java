@@ -41,14 +41,29 @@ public class PreLoginClient {
 
     }
 
-    private String playGame(String... parameters) {
+    private String playGame(String... parameters) throws ResponseException {
         if (parameters.length < 2) {
             return "Error: You must specify the game number and the color (e.g., '1' 'WHITE').";
         }
+        List<GameData> gamesList = server.listGames(authData);
+        try {
+            int gameNumber = Integer.parseInt(parameters[0]); // Game number selected by the user
+            String color = parameters[1]; // Color chosen by the user
 
-        String id = parameters[0];
-        String color = parameters[1];
-        server.joinGame(authData, color, id);
+            GameData selectedGame = gamesList.get(gameNumber - 1); // Adjust for zero-indexed list
+            int gameID = selectedGame.gameID(); // Get the ID of the selected game
+
+            // Call the server to join the game
+            server.joinGame(authData, color, gameID);
+            return String.format("You have joined the game '%s' as %s!", selectedGame.gameName(), color);
+
+        } catch (NumberFormatException e) {
+            return "Error: Invalid game number. Please enter a valid number.";
+        } catch (IndexOutOfBoundsException e) {
+            return "Error: Invalid game number. No game exists with that number.";
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String observeGame() {
