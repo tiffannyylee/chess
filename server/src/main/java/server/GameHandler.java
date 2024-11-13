@@ -31,6 +31,10 @@ public class GameHandler {
         List<GameData> games = gameService.listGames(authToken);
         response.type("application/json");
         response.status(200);
+        System.out.println("Auth Token: " + authToken);
+        System.out.println("Games List: " + games);  // Check if games list is populated
+        System.out.println("Serialized Response: " + serializer.toJson(new GameListResult(games)));
+
         return serializer.toJson(new GameListResult(games));
     }
 

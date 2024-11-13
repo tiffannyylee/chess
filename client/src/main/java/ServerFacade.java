@@ -52,14 +52,14 @@ public class ServerFacade {
 
     public List<GameData> listGames(AuthData auth) throws ResponseException {
         String path = "/game";
-        record listGamesResponse(List<GameData> gameData) {
+        record listGamesResponse(List<GameData> games) {
         }
         var response = this.makeRequest("GET", path, null, listGamesResponse.class, auth);
         assert response != null;
-        if (response == null || response.gameData() == null) {
+        if (response == null || response.games() == null) {
             throw new ResponseException(500, "Failed to retrieve game data");
         }
-        return response.gameData();
+        return response.games();
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, AuthData auth) throws ResponseException {

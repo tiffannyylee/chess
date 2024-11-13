@@ -49,19 +49,37 @@ public class PreLoginClient {
         return "";
     }
 
+    public String listGamesDisplay(List<GameData> games) {
+        StringBuilder display = new StringBuilder();
+        int count = 1;
+        for (GameData game : games) {
+            String gameName = game.gameName();
+            String whitePlayer = game.whiteUsername() != null ? game.whiteUsername() : "TBD";
+            String blackPlayer = game.blackUsername() != null ? game.blackUsername() : "TBD";
+
+            // Format each game's display
+            display.append(String.format("%d. Game Name: %s | Players: %s vs %s\n", count, gameName, whitePlayer, blackPlayer));
+            count++;
+        }
+        return display.toString();
+    }
+
+
     private String listGames() throws ResponseException {
         assertLoggedIn();
         List<GameData> games = server.listGames(authData);
-        return games.toString();
+        return listGamesDisplay(games);
     }
 
     private String createGame(String... parameters) throws ResponseException {
         assertLoggedIn();
-        if (parameters.length >= 1) {
+        if (parameters.length == 1) {
             String gameName = parameters[0];
             server.createGame(gameName, authData);
-        } else {
+        } else if (parameters.length < 1) {
             throw new ResponseException(500, "game name is expected");
+        } else {
+            return "Please keep the name to one word!";
         }
         return String.format("%s has been created!", parameters[0]);
     }
@@ -72,6 +90,7 @@ public class PreLoginClient {
             server.logout(authData);
             authData = null;
         }
+        state = State.LOGGEDOUT;
         return "You have logged out";
     }
 
@@ -90,16 +109,29 @@ public class PreLoginClient {
     }
 
     public String login(String... parameters) throws ResponseException {
-        if (parameters.length >= 2) {
-            String username = parameters[0];
-            String password = parameters[1];
-            UserData user = new UserData(username, password, null);
-            authData = server.login(user);
-            state = State.LOGGEDIN;
-            return String.format("You are now logged in as %s!", username);
-        } else {
-            throw new ResponseException(500, "username and password are required");
+        try {
+            if (parameters.length == 2) {
+                String username = parameters[0];
+                String password = parameters[1];
+                UserData user = new UserData(username, password, null);
+                authData = server.login(user);
+                state = State.LOGGEDIN;
+                return String.format("You are now logged in as %s!", username);
+            } else if (parameters.length < 2) {
+                return "Username and password are required!";
+            } else {
+                return "you have entered too many things! just username and password please:)";
+            }
+        } catch (ResponseException e) {
+            logError(e);
+            return "Error: Unable to log in. Please check your username and password, and try again.";
+
         }
+
+    }
+
+    private void logError(Exception e) {
+        e.printStackTrace();
     }
 
     private void assertLoggedIn() throws ResponseException {
