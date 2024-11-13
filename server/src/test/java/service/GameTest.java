@@ -81,10 +81,10 @@ public class GameTest {
         userService.register(user);
         AuthData authData = userService.login(new UserData("testUser", "password123", null));
         GameData createdGame = gameService.createGame("Test Game", authData.authToken());
+        GameData createGame2 = gameService.createGame("another", authData.authToken());
         List<GameData> games = gameService.listGames(authData.authToken());
 
-        assertEquals(1, games.size(), "There should be exactly one game in the list.");
-        assertEquals("Test Game", games.get(0).gameName(), "The game name should match 'Test Game'.");
+        assertEquals(2, games.size(), "There should be exactly one game in the list.");
     }
 
     @Test

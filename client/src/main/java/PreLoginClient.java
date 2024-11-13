@@ -1,8 +1,10 @@
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class PreLoginClient {
     private final ServerFacade server;
@@ -47,8 +49,10 @@ public class PreLoginClient {
         return "";
     }
 
-    private String listGames() {
-        return "";
+    private String listGames() throws ResponseException {
+        assertLoggedIn();
+        List<GameData> games = server.listGames(authData);
+        return games.toString();
     }
 
     private String createGame(String... parameters) throws ResponseException {

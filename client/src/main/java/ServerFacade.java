@@ -48,12 +48,15 @@ public class ServerFacade {
 //
 //    }
 
-    public List<GameData> listGames() throws ResponseException {
+    public List<GameData> listGames(AuthData auth) throws ResponseException {
         String path = "/game";
         record listGamesResponse(List<GameData> gameData) {
         }
-        var response = this.makeRequest("GET", path, null, listGamesResponse.class, null);
+        var response = this.makeRequest("GET", path, null, listGamesResponse.class, auth);
         assert response != null;
+        if (response == null || response.gameData() == null) {
+            throw new ResponseException(500, "Failed to retrieve game data");
+        }
         return response.gameData();
     }
 

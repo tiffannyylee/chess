@@ -29,7 +29,8 @@ public class GameHandler {
         String authToken = request.headers("Authorization");
 
         List<GameData> games = gameService.listGames(authToken);
-
+        response.type("application/json");
+        response.status(200);
         return serializer.toJson(new GameListResult(games));
     }
 
@@ -47,7 +48,7 @@ public class GameHandler {
         JoinGameRequest joinGameRequest = serializer.fromJson(request.body(), JoinGameRequest.class);
         String playerColor = joinGameRequest.playerColor();
         int gameId = joinGameRequest.gameID();
-        if (playerColor == null){
+        if (playerColor == null) {
             throw new BadRequestException("player color is null");
         }
         gameService.joinGame(playerColor, gameId, authToken);
