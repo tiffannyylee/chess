@@ -1,3 +1,4 @@
+import ServerFacade.ServerFacade;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -131,17 +132,24 @@ public class PreLoginClient {
     }
 
     public String register(String... parameters) throws ResponseException {
-        if (parameters.length >= 3) {
-            String username = parameters[0];
-            String password = parameters[1];
-            String email = parameters[2];
-            UserData user = new UserData(username, password, email);
-            authData = server.register(user);
-            state = State.LOGGEDIN;
-            return String.format("User %s is now registered.", username);
-        } else {
-            throw new ResponseException(500, "Expected more parameters");
+        try {
+            if (parameters.length == 3) {
+                String username = parameters[0];
+                String password = parameters[1];
+                String email = parameters[2];
+                UserData user = new UserData(username, password, email);
+                authData = server.register(user);
+                state = State.LOGGEDIN;
+                return String.format("User %s is now registered.", username);
+            } else if (parameters.length < 3) {
+                return "You are missing credentials. Please enter a username, password, and email.";
+            } else {
+                return "You have entered too many arguments! please try again.";
+            }
+        } catch (ResponseException e) {
+            return "Unable to register. Please make sure you are not already registered";
         }
+
     }
 
     public String login(String... parameters) throws ResponseException {
@@ -159,7 +167,7 @@ public class PreLoginClient {
                 return "you have entered too many things! just username and password please:)";
             }
         } catch (ResponseException e) {
-            logError(e);
+            //logError(e);
             return "Error: Unable to log in. Please check your username and password, and try again.";
 
         }
