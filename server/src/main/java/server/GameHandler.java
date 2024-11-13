@@ -51,11 +51,11 @@ public class GameHandler {
         String authToken = request.headers("Authorization");
         JoinGameRequest joinGameRequest = serializer.fromJson(request.body(), JoinGameRequest.class);
         String playerColor = joinGameRequest.playerColor();
-        int gameId = joinGameRequest.gameID();
+        int gameID = joinGameRequest.gameID();
         if (playerColor == null) {
             throw new BadRequestException("player color is null");
         }
-        gameService.joinGame(playerColor, gameId, authToken);
+        gameService.joinGame(playerColor, gameID, authToken);
         response.status(200);
         return "";
     }

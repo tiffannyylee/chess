@@ -117,4 +117,12 @@ public class ServerFacadeTests {
         assertThrows(ResponseException.class, () -> facade.createGame("game", auth));
     }
 
+    @Test
+    void joinGameSuccess() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        AuthData auth = facade.register(user);
+        facade.createGame("game", auth);
+
+    }
+
 }

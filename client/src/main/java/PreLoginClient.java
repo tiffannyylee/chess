@@ -55,7 +55,7 @@ public class PreLoginClient {
             GameData selectedGame = gamesList.get(gameNumber - 1); // Adjust for zero-indexed list
             int gameID = selectedGame.gameID(); // Get the ID of the selected game
 
-            // Call the server to join the game
+            // Calls the server to join the game
             server.joinGame(authData, color, gameID);
             String message = String.format("You have joined the game '%s' as %s!", selectedGame.gameName(), color);
             var out = new PrintStream(System.out);
