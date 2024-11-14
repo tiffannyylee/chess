@@ -51,7 +51,9 @@ public class PreLoginClient {
         try {
             int gameNumber = Integer.parseInt(parameters[0]); // Game number selected by the user
             String color = parameters[1].toUpperCase(); // Color chosen by the user
-
+            if (!color.equals("WHITE") && !color.equals("BLACK")) {
+                return "please enter a valid color (white or black)";
+            }
             GameData selectedGame = gamesList.get(gameNumber - 1); // Adjust for zero-indexed list
             int gameID = selectedGame.gameID(); // Get the ID of the selected game
 
