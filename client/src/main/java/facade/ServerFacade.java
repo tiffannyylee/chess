@@ -5,9 +5,9 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import requests.CreateGameRequest;
-import requests.JoinGameRequest;
-import requests.RegisterRequest;
+import clientrequests.CreateGameRequest;
+import clientrequests.JoinGameRequest;
+import clientrequests.RegisterRequest;
 
 import java.io.IOException;
 import java.io.InputStream;

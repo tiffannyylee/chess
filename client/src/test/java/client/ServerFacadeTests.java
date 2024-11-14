@@ -10,7 +10,6 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 import facade.ServerFacade;
-import requests.CreateGameRequest;
 
 import java.util.List;
 
