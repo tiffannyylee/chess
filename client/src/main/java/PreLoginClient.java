@@ -76,15 +76,19 @@ public class PreLoginClient {
         List<GameData> gamesList = server.listGames(authData);
         try {
             int gameNumber = Integer.parseInt(parameters[0]); // Game number selected by the user
-            GameData selectedGame = gamesList.get(gameNumber - 1); // Adjust for zero-indexed list
-            int gameID = selectedGame.gameID(); // Get the ID of the selected game
-            String message = String.format("You are watching the game '%s'!", selectedGame.gameName());
-            var out = new PrintStream(System.out);
-            BoardUI.drawChessBoardBlack(out);
-            BoardUI.drawChessBoardWhite(out);
-            return message;
+            if (gameNumber > gamesList.size() || gameNumber <= 0) {
+                return "This game does not exist";
+            } else {
+                GameData selectedGame = gamesList.get(gameNumber - 1); // Adjust for zero-indexed list
+                int gameID = selectedGame.gameID(); // Get the ID of the selected game
+                String message = String.format("You are watching the game '%s'!", selectedGame.gameName());
+                var out = new PrintStream(System.out);
+                BoardUI.drawChessBoardBlack(out);
+                BoardUI.drawChessBoardWhite(out);
+                return message;
+            }
         } catch (NumberFormatException e) {
-            throw new RuntimeException(e);
+            return "Please enter a number.";
         }
     }
 
@@ -104,8 +108,17 @@ public class PreLoginClient {
 
     private String listGames() throws ResponseException {
         assertLoggedIn();
-        List<GameData> games = server.listGames(authData);
-        return listGamesDisplay(games);
+        try {
+            List<GameData> games = server.listGames(authData);
+            if (games.isEmpty()) {
+                return "There are no games currently. Why don't you create one?";
+            } else {
+                return listGamesDisplay(games);
+            }
+        } catch (ResponseException e) {
+            return "Something went wrong!";
+        }
+
     }
 
     private String createGame(String... parameters) throws ResponseException {
