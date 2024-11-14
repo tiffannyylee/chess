@@ -68,7 +68,7 @@ public class PreLoginClient {
         } catch (IndexOutOfBoundsException e) {
             return "Error: Invalid game number. No game exists with that number.";
         } catch (ResponseException e) {
-            throw new RuntimeException(e);
+            return "Something went wrong! Make sure you are authorized.";
         }
     }
 
