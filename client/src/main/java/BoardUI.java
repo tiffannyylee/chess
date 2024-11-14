@@ -10,7 +10,7 @@ public class BoardUI {
     private static final String DARK_COLOR = SET_BG_COLOR_RED;
     private static final String RESET_COLOR = "\u001B[0m";
 
-    private static final String[][] initialBoardWhite = {
+    private static final String[][] INITIAL_BOARD_WHITE = {
             {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK},
             {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
             {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
@@ -21,7 +21,7 @@ public class BoardUI {
             {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}
     };
 
-    private static final String[][] initialBoardBlack = {
+    private static final String[][] INITIAL_BOARD_BLACK = {
             {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK},
             {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN},
             {"   ", "   ", "   ", "   ", "   ", "   ", "   ", "   "},
@@ -78,11 +78,11 @@ public class BoardUI {
     }
 
     public static void drawChessBoardWhite(PrintStream out) {
-        drawChessBoard(out, initialBoardWhite);
+        drawChessBoard(out, INITIAL_BOARD_WHITE);
     }
 
     public static void drawChessBoardBlack(PrintStream out) {
-        drawChessBoard(out, initialBoardBlack);
+        drawChessBoard(out, INITIAL_BOARD_BLACK);
     }
 
     public static void main(String[] args) {

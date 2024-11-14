@@ -179,9 +179,6 @@ public class PreLoginClient {
 
     }
 
-    private void logError(Exception e) {
-        e.printStackTrace();
-    }
 
     private void assertLoggedIn() throws ResponseException {
         if (state == State.LOGGEDOUT) {
