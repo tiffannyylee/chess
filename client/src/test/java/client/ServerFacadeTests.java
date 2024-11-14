@@ -122,6 +122,47 @@ public class ServerFacadeTests {
         UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
         AuthData auth = facade.register(user);
         facade.createGame("game", auth);
+        List<GameData> games = facade.listGames(auth);
+        int gameID = games.stream()
+                .filter(game -> "game".equals(game.gameName()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Game not found"))
+                .gameID();
+        assertDoesNotThrow(() -> facade.joinGame(auth, "WHITE", gameID));
+    }
+
+    @Test
+    void joinGameFail() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        AuthData auth = facade.register(user);
+        facade.createGame("game", auth);
+        List<GameData> games = facade.listGames(auth);
+        int gameID = games.stream()
+                .filter(game -> "game".equals(game.gameName()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Game not found"))
+                .gameID();
+        facade.joinGame(auth, "WHITE", gameID);
+        assertThrows(ResponseException.class, () -> facade.joinGame(auth, "WHITE", gameID));
+    }
+
+    @Test
+    void listGamesSuccess() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        AuthData auth = facade.register(user);
+        facade.createGame("game1", auth);
+        facade.createGame("game2", auth);
+        facade.createGame("game3", auth);
+        assertEquals(3, facade.listGames(auth).size());
+    }
+
+    @Test
+    void listGamesFail() throws Exception {
+        UserData user = new UserData("tiff", "pass", "tiff@byu.edu");
+        AuthData auth = facade.register(user);
+        AuthData badauth = new AuthData("bad", "tiff");
+        assertThrows(ResponseException.class, () -> facade.listGames(badauth));
+
 
     }
 

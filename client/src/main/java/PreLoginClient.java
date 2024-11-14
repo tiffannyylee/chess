@@ -50,7 +50,7 @@ public class PreLoginClient {
         List<GameData> gamesList = server.listGames(authData);
         try {
             int gameNumber = Integer.parseInt(parameters[0]); // Game number selected by the user
-            String color = parameters[1]; // Color chosen by the user
+            String color = parameters[1].toUpperCase(); // Color chosen by the user
 
             GameData selectedGame = gamesList.get(gameNumber - 1); // Adjust for zero-indexed list
             int gameID = selectedGame.gameID(); // Get the ID of the selected game
