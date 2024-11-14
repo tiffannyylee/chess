@@ -109,19 +109,19 @@ public class PreLoginClient {
     }
 
     private String createGame(String... parameters) throws ResponseException {
+        assertLoggedIn();
         try {
-            assertLoggedIn();
             if (parameters.length == 1) {
                 String gameName = parameters[0];
                 server.createGame(gameName, authData);
             } else if (parameters.length < 1) {
-                throw new ResponseException(500, "game name is expected");
+                return "game name is expected";
             } else {
                 return "Please keep the name to one word!";
             }
             return String.format("%s has been created!", parameters[0]);
         } catch (ResponseException e) {
-            return "Something went wrong. This game name may already exist. Try another.";
+            return "Something went wrong. Be sure to enter a unique game name.";
         }
 
     }
@@ -172,7 +172,6 @@ public class PreLoginClient {
                 return "you have entered too many things! just username and password please:)";
             }
         } catch (ResponseException e) {
-            //logError(e);
             return "Error: Unable to log in. Please check your username and password, and try again.";
 
         }
@@ -180,9 +179,9 @@ public class PreLoginClient {
     }
 
 
-    private void assertLoggedIn() throws ResponseException {
+    private void assertLoggedIn() {
         if (state == State.LOGGEDOUT) {
-            throw new ResponseException(400, "You must sign in");
+            System.out.print("You must sign in to continue.");
         }
     }
 
