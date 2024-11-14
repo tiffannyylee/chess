@@ -77,6 +77,9 @@ public class PreLoginClient {
     private String observeGame(String... parameters) throws ResponseException {
         List<GameData> gamesList = server.listGames(authData);
         try {
+            if (parameters.length < 1) {
+                return "you need to enter a game number!";
+            }
             int gameNumber = Integer.parseInt(parameters[0]); // Game number selected by the user
             if (gameNumber > gamesList.size() || gameNumber <= 0) {
                 return "This game does not exist";
