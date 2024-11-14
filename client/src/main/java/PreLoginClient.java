@@ -1,4 +1,4 @@
-import ServerFacade.ServerFacade;
+import facade.ServerFacade;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;

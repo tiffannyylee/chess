@@ -1,4 +1,4 @@
-package ServerFacade;
+package facade;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
@@ -57,9 +57,9 @@ public class ServerFacade {
 
     public List<GameData> listGames(AuthData auth) throws ResponseException {
         String path = "/game";
-        record listGamesResponse(List<GameData> games) {
+        record ListGamesResponse(List<GameData> games) {
         }
-        var response = this.makeRequest("GET", path, null, listGamesResponse.class, auth);
+        var response = this.makeRequest("GET", path, null, ListGamesResponse.class, auth);
         assert response != null;
         if (response == null || response.games() == null) {
             throw new ResponseException(500, "Failed to retrieve game data");

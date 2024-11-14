@@ -2,7 +2,6 @@ package client;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.DatabaseManager;
 import dataaccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
@@ -10,9 +9,8 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
-import ServerFacade.ServerFacade;
+import facade.ServerFacade;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
