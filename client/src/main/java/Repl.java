@@ -1,5 +1,8 @@
+import websocket.messages.Notification;
+
 import java.util.Scanner;
 
+import static java.awt.Color.RED;
 import static ui.EscapeSequences.*;
 
 
@@ -29,6 +32,10 @@ public class Repl {
         System.out.println();
     }
 
+    public void notify(Notification notification) {
+        System.out.println(RED + notification.getMessage());
+        printPrompt();
+    }
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
