@@ -1,3 +1,4 @@
+import chess.ChessMove;
 import facade.ServerFacade;
 import exception.ResponseException;
 import model.AuthData;
@@ -196,6 +197,23 @@ public class PreLoginClient {
 
     }
 
+    //    public ChessBoard redrawBoard(){
+//
+//    }
+//    public void leave() {
+//
+//    }
+//
+//    public ChessMove makeMove() {
+//
+//    }
+//
+//    public void resign() {
+//
+//    }
+//    public void highlight(){
+//
+//    }
 
     private void assertLoggedIn() {
         if (state == State.LOGGEDOUT) {
