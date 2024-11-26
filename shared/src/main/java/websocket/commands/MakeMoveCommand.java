@@ -1,6 +1,8 @@
 package websocket.commands;
 
 import chess.ChessMove;
+import model.AuthData;
+import model.UserData;
 
 public class MakeMoveCommand extends UserGameCommand {
     private final ChessMove move;
@@ -16,4 +18,5 @@ public class MakeMoveCommand extends UserGameCommand {
     public ChessMove getMove() {
         return move;
     }
+   
 }
