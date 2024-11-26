@@ -34,4 +34,13 @@ public class ConnectionManager {
             connections.remove(c.userName);
         }
     }
+
+    public void send(String userName, ServerMessage message) throws IOException {
+        Connection connection = connections.get(userName);
+        if (connection != null && connection.session.isOpen()) {
+            connection.send(message.toString());
+        } else {
+            System.err.println("Failed to send message to " + userName + ": Connection is closed or does not exist.");
+        }
+    }
 }
