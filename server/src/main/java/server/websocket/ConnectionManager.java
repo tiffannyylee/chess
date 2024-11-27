@@ -1,5 +1,6 @@
 package server.websocket;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
@@ -20,11 +21,12 @@ public class ConnectionManager {
     }
 
     public void broadcast(String excludeUserName, ServerMessage message) throws IOException {
+        Gson gson = new Gson();
         ArrayList<Connection> badConnections = new ArrayList<>();
         for (Connection c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.userName.equals(excludeUserName)) {
-                    c.send(message.toString());
+                    c.session.getRemote().sendString(gson.toJson(message));
                 }
             } else {
                 badConnections.add(c);
@@ -35,12 +37,17 @@ public class ConnectionManager {
         }
     }
 
-    public void send(String userName, ServerMessage message) throws IOException {
-        Connection connection = connections.get(userName);
-        if (connection != null && connection.session.isOpen()) {
-            connection.send(message.toString());
-        } else {
-            System.err.println("Failed to send message to " + userName + ": Connection is closed or does not exist.");
-        }
+    public void send(Session session, ServerMessage message) throws IOException {
+        Gson gson = new Gson();
+        String jsonMessage = gson.toJson(message);
+        session.getRemote().sendString(jsonMessage);
+        System.out.println("Sent message to client: " + jsonMessage);
+//        Connection connection = connections.get(userName);
+//        String jsonMessage = gson.toJson(message);
+//        if (connection != null && connection.session.isOpen()) {
+//            connection.send(jsonMessage);
+//        } else {
+//            System.err.println("Failed to send message to " + userName + ": Connection is closed or does not exist.");
+//        }
     }
 }

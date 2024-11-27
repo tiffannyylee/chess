@@ -22,7 +22,7 @@ public class Server {
 
             Spark.staticFiles.location("web");
             //websocket
-            //Spark.webSocket("/ws", webSocketHandler);
+            Spark.webSocket("/ws", webSocketHandler);
 
             // Register your endpoints and handle exceptions here.
             Spark.post("/user", (userHandler::createUser));

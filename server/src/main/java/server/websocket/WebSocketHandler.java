@@ -19,10 +19,13 @@ import java.io.IOException;
 @WebSocket
 public class WebSocketHandler {
     ConnectionManager connections = new ConnectionManager();
-    private MySQLDataAccess dataAccess;
+    private MySQLDataAccess dataAccess = new MySQLDataAccess();
+    private Gson gson = new Gson();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, DataAccessException {
+        System.out.println("Received message: " + message);
+        handleMessage(message);
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         switch (command.getCommandType()) {
             case CONNECT -> connect(command.getAuthToken(), session, command.getGameID());
@@ -31,6 +34,24 @@ public class WebSocketHandler {
             case RESIGN -> resign();
         }
 
+    }
+
+    public void handleMessage(String message) {
+        try {
+            // Log the message
+            System.out.println("Raw message received: " + message);
+
+            // Deserialize the JSON string into a UserGameCommand object
+
+            UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+
+            // Log deserialized object
+            System.out.println("Command Type: " + command.getCommandType());
+            System.out.println("Auth Token: " + command.getAuthToken());
+            System.out.println("Game ID: " + command.getGameID());
+        } catch (Exception e) {
+            System.err.println("Error deserializing message: " + e.getMessage());
+        }
     }
 
     private void connect(String authToken, Session session, int gameID) throws DataAccessException, IOException {
@@ -42,12 +63,14 @@ public class WebSocketHandler {
             throw new DataAccessException("Invalid authentication token");
         }
         connections.add(user.username(), session);
-        ChessGame game = dataAccess.getGame(gameID).game();
+        GameData game = dataAccess.getGame(gameID);
         if (game == null) {
             throw new DataAccessException("Game not found for ID: " + gameID);
         }
+        String jsonGame = gson.toJson(game);
         LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, game);
-        connections.send(user.username(), loadGame);
+        String loadGameJson = gson.toJson(loadGame);
+        connections.send(session, loadGame);
         var message = String.format("%s has joined the game", user.username());
         Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(user.username(), notification);
