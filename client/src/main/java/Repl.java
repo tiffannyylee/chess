@@ -11,7 +11,7 @@ import static ui.EscapeSequences.*;
 public class Repl implements ServerMessageObserver {
     private final PreLoginClient client;
 
-    public Repl(String serverUrl, ServerMessageObserver messageObserver) {
+    public Repl(String serverUrl) {
         client = new PreLoginClient(serverUrl, this);
     }
 
