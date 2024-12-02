@@ -60,6 +60,7 @@ public class PreLoginClient {
 
             // Calls the server to join the game
             server.joinGame(authData, color, gameID);
+            state = State.GAMEPLAY;
             String message = String.format("You have joined the game '%s' as %s!", selectedGame.gameName(), color);
             var out = new PrintStream(System.out);
             BoardUI.drawChessBoardBlack(out);
@@ -91,6 +92,7 @@ public class PreLoginClient {
                 var out = new PrintStream(System.out);
                 BoardUI.drawChessBoardBlack(out);
                 BoardUI.drawChessBoardWhite(out);
+                state = State.GAMEPLAY;
                 return message;
             }
         } catch (NumberFormatException e) {
@@ -228,7 +230,7 @@ public class PreLoginClient {
                     login <USERNAME> <PASSWORD> - to log in
                     quit - to quit playing
                     help - to see all possible commands""";
-        } else {
+        } else if (state == State.LOGGEDIN) {
             return """
                     logout - to log out
                     create <GameName> - to create a new game
@@ -236,6 +238,15 @@ public class PreLoginClient {
                     play <ID> [WHITE|BLACK] - to join a game
                     observe <ID> - watch a game
                     quit - to quit playing
+                    help - to see all possible commands
+                    """;
+        } else {
+            return """
+                    redraw - to redraw the chess board
+                    leave - to leave the game
+                    move - to make a move
+                    resign - to forfeit the game
+                    highlight - to highlight legal moves for a piece
                     help - to see all possible commands
                     """;
         }
