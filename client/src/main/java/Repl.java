@@ -1,4 +1,6 @@
+import facade.ServerMessageObserver;
 import websocket.messages.Notification;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
@@ -6,11 +8,11 @@ import static java.awt.Color.RED;
 import static ui.EscapeSequences.*;
 
 
-public class Repl {
+public class Repl implements ServerMessageObserver {
     private final PreLoginClient client;
 
-    public Repl(String serverUrl) {
-        client = new PreLoginClient(serverUrl);
+    public Repl(String serverUrl, ServerMessageObserver messageObserver) {
+        client = new PreLoginClient(serverUrl, this);
     }
 
     public void run() {
@@ -32,14 +34,15 @@ public class Repl {
         System.out.println();
     }
 
-    public void notify(Notification notification) {
-        System.out.println(RED + notification.getMessage());
-        printPrompt();
-    }
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
+    @Override
+    public void notify(ServerMessage message) {
+        System.out.println(RED + message.toString());
+        printPrompt();
+    }
 }
 

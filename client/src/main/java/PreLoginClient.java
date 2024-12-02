@@ -1,11 +1,14 @@
 import chess.ChessMove;
 import facade.ServerFacade;
 import exception.ResponseException;
+import facade.ServerMessageObserver;
+import facade.WebSocketFacade;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 
 import java.io.PrintStream;
+import java.net.http.WebSocket;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,11 +17,14 @@ public class PreLoginClient {
     private final String serverUrl;
     private State state = State.LOGGEDOUT;
     private AuthData authData;
+    private WebSocketFacade ws;
+    private final ServerMessageObserver messageObserver;
 
 
-    public PreLoginClient(String serverUrl) {
+    public PreLoginClient(String serverUrl, ServerMessageObserver messageObserver) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.messageObserver = messageObserver;
     }
 
     public String eval(String input) throws ResponseException {
@@ -85,6 +91,7 @@ public class PreLoginClient {
 
             // Calls the server to join the game
             server.joinGame(authData, color, gameID);
+            ws = new WebSocketFacade(serverUrl, messageObserver);
             state = State.GAMEPLAY;
             String message = String.format("You have joined the game '%s' as %s!", selectedGame.gameName(), color);
             var out = new PrintStream(System.out);
