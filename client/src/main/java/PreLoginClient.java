@@ -35,6 +35,11 @@ public class PreLoginClient {
                 case "list" -> listGames();
                 case "observe" -> observeGame(parameters);
                 case "play" -> playGame(parameters);
+                case "redraw" -> redrawBoard();
+                case "leave" -> leaveGame();
+                case "move" -> makeMove();
+                case "resign" -> resignGame();
+                case "highlight" -> highlightMoves();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -42,6 +47,26 @@ public class PreLoginClient {
             throw new ResponseException(500, e.getMessage());
         }
 
+    }
+
+    private String highlightMoves() {
+        return null;
+    }
+
+    private String resignGame() {
+        return null;
+    }
+
+    private String makeMove() {
+        return null;
+    }
+
+    private String leaveGame() {
+        return null;
+    }
+
+    private String redrawBoard() {
+        return null;
     }
 
     private String playGame(String... parameters) throws ResponseException {
