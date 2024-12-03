@@ -1,8 +1,6 @@
-package websocket.commands;
+package websocket.messages;
 
-import chess.ChessGame;
 import model.GameData;
-import websocket.messages.ServerMessage;
 
 public class LoadGame extends ServerMessage {
     private GameData game;
@@ -20,4 +18,5 @@ public class LoadGame extends ServerMessage {
     public void setGame(GameData game) {
         this.game = game;
     }
+
 }

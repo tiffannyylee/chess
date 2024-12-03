@@ -12,4 +12,9 @@ public class Notification extends ServerMessage {
     public String getMessage() {
         return this.message;
     }
+
+    @Override
+    public String toString() {
+        return STR."ServerMessage{type='\{serverMessageType}', content='\{message}'}";
+    }
 }

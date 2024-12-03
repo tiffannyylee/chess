@@ -92,6 +92,7 @@ public class PreLoginClient {
             // Calls the server to join the game
             server.joinGame(authData, color, gameID);
             ws = new WebSocketFacade(serverUrl, messageObserver);
+            ws.connect(authData, gameID);
             state = State.GAMEPLAY;
             String message = String.format("You have joined the game '%s' as %s!", selectedGame.gameName(), color);
             var out = new PrintStream(System.out);
@@ -109,6 +110,7 @@ public class PreLoginClient {
     }
 
     private String observeGame(String... parameters) throws ResponseException {
+        //ws.connect
         List<GameData> gamesList = server.listGames(authData);
         try {
             if (parameters.length < 1) {
@@ -235,15 +237,15 @@ public class PreLoginClient {
 //
 //    }
 //    public void leave() {
-//
+//      ws.leave
 //    }
 //
 //    public ChessMove makeMove() {
-//
+//      ws.makemove
 //    }
 //
 //    public void resign() {
-//
+//      ws.resign
 //    }
 //    public void highlight(){
 //
