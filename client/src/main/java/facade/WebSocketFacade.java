@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exception.ResponseException;
 import model.AuthData;
+import websocket.commands.ConnectCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
@@ -76,7 +77,7 @@ public class WebSocketFacade extends Endpoint {
         //receive game, everyone else receive notification
         try {
             // Create a connect command message
-            UserGameCommand connectMessage = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authData.authToken(), gameID);
+            ConnectCommand connectMessage = new ConnectCommand(UserGameCommand.CommandType.CONNECT, authData.authToken(), gameID, playerColor);
 
             // Convert the message to JSON
             String jsonMessage = new Gson().toJson(connectMessage);

@@ -9,6 +9,7 @@ import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import java.io.PrintStream;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
@@ -125,11 +126,12 @@ public class Repl implements ServerMessageObserver {
     // Handle the LOAD_GAME message
     private void handleLoadGame(LoadGame message) {
         var out = new PrintStream(System.out);
+        String color = message.getPlayerColor();
         ChessBoard board = message.getGame().game().getBoard();
-        String[][] boardArray = convertBoardToStringArray(board, true);
-        //boolean isWhitePerspective = message.getGame().game().getCurrentTeamColor() == ChessGame.TeamColor.WHITE;
+        boolean isWhitePerspective = Objects.equals(message.getPlayerColor(), "WHITE");
+        String[][] boardArray = convertBoardToStringArray(board, isWhitePerspective);
         //BoardUI.drawDynamicChessBoard(out, boardArray, true);
-        BoardUI.drawChessBoard(out, boardArray, true);
+        BoardUI.drawChessBoard(out, boardArray, isWhitePerspective);
         System.out.println("Received Load Game Message: " + message.getGame().game().getBoard());
         // Update the game state with the new game state (e.g., render the board)
         // You might need to update your game UI or internal state here
