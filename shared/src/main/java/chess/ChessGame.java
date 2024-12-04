@@ -28,6 +28,10 @@ public class ChessGame {
         return currentTeamColor;
     }
 
+    public String getColorString() {
+        return currentTeamColor.toString();
+    }
+
     /**
      * Set's which teams turn it is
      *

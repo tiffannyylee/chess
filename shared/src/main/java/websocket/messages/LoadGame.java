@@ -17,7 +17,6 @@ public class LoadGame extends ServerMessage {
         return game;
     }
 
-    // Optionally, add a setter if you need to modify the game later
     public void setGame(GameData game) {
         this.game = game;
     }

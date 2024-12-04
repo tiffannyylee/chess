@@ -16,6 +16,7 @@ public class UserGameCommandDeserializer implements JsonDeserializer<UserGameCom
             case CONNECT:
                 return context.deserialize(jsonObject, ConnectCommand.class);
             case MAKE_MOVE:
+                return context.deserialize(jsonObject, MakeMoveCommand.class);
             case LEAVE:
             case RESIGN:
             default:

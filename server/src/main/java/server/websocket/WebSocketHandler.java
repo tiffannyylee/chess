@@ -1,6 +1,8 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
@@ -12,6 +14,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.ConnectCommand;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommandDeserializer;
 import websocket.messages.LoadGame;
 import websocket.commands.UserGameCommand;
@@ -28,10 +31,9 @@ public class WebSocketHandler {
     private Gson gson = new Gson();
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException, DataAccessException {
+    public void onMessage(Session session, String message) throws IOException, DataAccessException, InvalidMoveException {
         System.out.println("Received message: " + message);
         handleMessage(message);
-        //UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(UserGameCommand.class, new UserGameCommandDeserializer())
                 .create();
@@ -46,7 +48,13 @@ public class WebSocketHandler {
                     System.out.println("Invalid command: CONNECT command is not of type ConnectCommand.");
                 }
             }
-            case MAKE_MOVE -> makeMove();
+            case MAKE_MOVE -> {
+                if (command instanceof MakeMoveCommand makeMoveCommand) {
+                    ChessMove move = makeMoveCommand.getMove();
+                    String color = makeMoveCommand.getPlayerColor();
+                    makeMove(command.getAuthToken(), session, command.getGameID(), color, move);
+                }
+            }
             case LEAVE -> leave();
             case RESIGN -> resign();
         }
@@ -117,12 +125,19 @@ public class WebSocketHandler {
         connections.broadcast(user.username(), notification);
     }
 
-    private void makeMove() {
+    private void makeMove(String authToken, Session session, int gameID, String color, ChessMove move) throws DataAccessException, InvalidMoveException {
         //verify move is valid
         //update game to show move and update game in database
         //send a load game to all clients
         //send notification to others about what move was made
         //send notification ab check checkmate or stalemate to all
+        GameData gameData = dataAccess.getGame(gameID);
+        ChessGame game = gameData.game();
+        if (game.getColorString().equals(color)) {
+            game.makeMove(move);
+            String opposingColor = color.equals("WHITE") ? "BLACK" : "WHITE";
+        }
+
     }
 
     private void leave() {

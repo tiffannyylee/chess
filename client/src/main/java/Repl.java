@@ -132,7 +132,7 @@ public class Repl implements ServerMessageObserver {
         String[][] boardArray = convertBoardToStringArray(board, isWhitePerspective);
         //BoardUI.drawDynamicChessBoard(out, boardArray, true);
         BoardUI.drawChessBoard(out, boardArray, isWhitePerspective);
-        System.out.println("Received Load Game Message: " + message.getGame().game().getBoard());
+        //System.out.println("Received Load Game Message: " + message.getGame().game().getBoard());
         // Update the game state with the new game state (e.g., render the board)
         // You might need to update your game UI or internal state here
     }
