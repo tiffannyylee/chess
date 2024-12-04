@@ -39,11 +39,11 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    System.out.println("Raw message: " + message);
+                    //System.out.println("Raw message: " + message);
 
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
                     messageObserver.notify(serverMessage);
-                    System.out.println(serverMessage);
+                    //System.out.println(serverMessage);
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {

@@ -1,16 +1,25 @@
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import facade.ServerMessageObserver;
 import websocket.messages.LoadGame;
 import websocket.messages.ErrorMessage;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
+import java.io.PrintStream;
 import java.util.Scanner;
 
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessPiece.PieceType.*;
 import static ui.EscapeSequences.*;
 
 
 public class Repl implements ServerMessageObserver {
     private final PreLoginClient client;
+
 
     public Repl(String serverUrl) {
         client = new PreLoginClient(serverUrl, this);
@@ -67,9 +76,57 @@ public class Repl implements ServerMessageObserver {
         }
     }
 
+    private String convertPieceToUnicode(ChessPiece piece) {
+        switch (piece.getTeamColor()) {
+            case WHITE:
+                return switch (piece.getPieceType()) {
+                    case KING -> "  ♔";
+                    case QUEEN -> "  ♕";
+                    case ROOK -> "  ♖";
+                    case BISHOP -> "  ♗";
+                    case KNIGHT -> "  ♘";
+                    case PAWN -> "  ♙";
+                };
+            case BLACK:
+                return switch (piece.getPieceType()) {
+                    case KING -> "  ♚";
+                    case QUEEN -> "  ♛";
+                    case ROOK -> "  ♜";
+                    case BISHOP -> "  ♝";
+                    case KNIGHT -> "  ♞";
+                    case PAWN -> "  ♟";
+                };
+            default:
+                return "   "; // In case of an invalid piece
+        }
+    }
+
+    private String[][] convertBoardToStringArray(ChessBoard board) {
+        int size = 8;
+        String[][] boardArray = new String[size][size];
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1)); // Assuming getPieceAt() returns a piece
+                if (piece != null) {
+                    boardArray[row][col] = convertPieceToUnicode(piece); // Convert the piece to Unicode
+                } else {
+                    boardArray[row][col] = "   "; // Empty square
+                }
+            }
+        }
+
+        return boardArray;
+    }
+
     // Handle the LOAD_GAME message
     private void handleLoadGame(LoadGame message) {
-        System.out.println("Received Load Game Message: " + message.getGame());
+        var out = new PrintStream(System.out);
+        ChessBoard board = message.getGame().game().getBoard();
+        String[][] boardArray = convertBoardToStringArray(board);
+        //boolean isWhitePerspective = message.getGame().game().getCurrentTeamColor() == ChessGame.TeamColor.WHITE;
+        BoardUI.drawDynamicChessBoard(out, boardArray, false);
+        System.out.println("Received Load Game Message: " + message.getGame().game().getBoard());
         // Update the game state with the new game state (e.g., render the board)
         // You might need to update your game UI or internal state here
     }
