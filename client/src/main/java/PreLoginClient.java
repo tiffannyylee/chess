@@ -96,8 +96,8 @@ public class PreLoginClient {
             state = State.GAMEPLAY;
             String message = String.format("You have joined the game '%s' as %s!", selectedGame.gameName(), color);
             var out = new PrintStream(System.out);
-            BoardUI.drawChessBoardBlack(out);
-            BoardUI.drawChessBoardWhite(out);
+//            BoardUI.drawChessBoardBlack(out);
+//            BoardUI.drawChessBoardWhite(out);
             return message;
 
         } catch (NumberFormatException e) {
@@ -124,8 +124,8 @@ public class PreLoginClient {
                 int gameID = selectedGame.gameID(); // Get the ID of the selected game
                 String message = String.format("You are watching the game '%s'!", selectedGame.gameName());
                 var out = new PrintStream(System.out);
-                BoardUI.drawChessBoardBlack(out);
-                BoardUI.drawChessBoardWhite(out);
+//                BoardUI.drawChessBoardBlack(out);
+//                BoardUI.drawChessBoardWhite(out);
                 state = State.GAMEPLAY;
                 return message;
             }

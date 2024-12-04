@@ -51,10 +51,10 @@ public class BoardUI {
     }
 
 
-    public static void drawChessBoard(PrintStream out, String[][] board) {
-        drawColumnHeaders(out, board == INITIAL_BOARD_WHITE);
+    public static void drawChessBoard(PrintStream out, String[][] board, boolean isWhitePerspective) {
+        drawColumnHeaders(out, isWhitePerspective);
         for (int row = 0; row < BOARD_SIZE; row++) {
-            int displayRow = board == INITIAL_BOARD_WHITE ? BOARD_SIZE - row : row + 1;
+            int displayRow = isWhitePerspective ? BOARD_SIZE - row : row + 1;
 
             // Repeat each square row to create a square
             for (int h = 0; h < SQUARE_HEIGHT; h++) {
@@ -67,7 +67,7 @@ public class BoardUI {
 
                 // Draw each column in the row
                 for (int col = 0; col < BOARD_SIZE; col++) {
-                    int displayCol = board == INITIAL_BOARD_WHITE ? col : BOARD_SIZE - col - 1;
+                    int displayCol = isWhitePerspective ? col : BOARD_SIZE - col - 1;
                     String color = (row + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
 
                     if (h == SQUARE_HEIGHT / 2) {  // Middle row to display piece
@@ -85,16 +85,16 @@ public class BoardUI {
             }
         }
 
-        drawColumnHeaders(out, board == INITIAL_BOARD_WHITE);
+        drawColumnHeaders(out, isWhitePerspective);
     }
 
-    public static void drawChessBoardWhite(PrintStream out) {
-        drawChessBoard(out, INITIAL_BOARD_WHITE);
-    }
-
-    public static void drawChessBoardBlack(PrintStream out) {
-        drawChessBoard(out, INITIAL_BOARD_BLACK);
-    }
+//    public static void drawChessBoardWhite(PrintStream out) {
+//        drawChessBoard(out, INITIAL_BOARD_WHITE);
+//    }
+//
+//    public static void drawChessBoardBlack(PrintStream out) {
+//        drawChessBoard(out, INITIAL_BOARD_BLACK);
+//    }
 
     public static String[][] initializeBoard(boolean isWhitePerspective) {
         return isWhitePerspective ? new String[][]{
@@ -158,7 +158,7 @@ public class BoardUI {
 
     public static void main(String[] args) {
         var out = new PrintStream(System.out);
-        drawChessBoardBlack(out);
-        drawChessBoardWhite(out); //white board
+//        drawChessBoardBlack(out);
+//        drawChessBoardWhite(out); //white board
     }
 }
