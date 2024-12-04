@@ -1,5 +1,6 @@
 package facade;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exception.ResponseException;

@@ -1,6 +1,8 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import dataaccess.MySQLDataAccess;
 import model.AuthData;
@@ -9,6 +11,8 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import websocket.commands.ConnectCommand;
+import websocket.commands.UserGameCommandDeserializer;
 import websocket.messages.LoadGame;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -27,9 +31,21 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException, DataAccessException {
         System.out.println("Received message: " + message);
         handleMessage(message);
-        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+        //UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(UserGameCommand.class, new UserGameCommandDeserializer())
+                .create();
+
+        UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
         switch (command.getCommandType()) {
-            case CONNECT -> connect(command.getAuthToken(), session, command.getGameID());
+            case CONNECT -> {
+                if (command instanceof ConnectCommand connectCommand) {
+                    ChessGame.TeamColor color = connectCommand.getColor();
+                    connect(command.getAuthToken(), session, command.getGameID(), color);
+                } else {
+                    System.out.println("Invalid command: CONNECT command is not of type ConnectCommand.");
+                }
+            }
             case MAKE_MOVE -> makeMove();
             case LEAVE -> leave();
             case RESIGN -> resign();
@@ -65,7 +81,7 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(String authToken, Session session, int gameID) throws DataAccessException, IOException {
+    private void connect(String authToken, Session session, int gameID, ChessGame.TeamColor color) throws DataAccessException, IOException {
         //connect to the connections manager
         //send load game to root
         //broadcast notification that root joined
@@ -94,7 +110,7 @@ public class WebSocketHandler {
             connections.send(session, errorMessage);
             return;
         }
-        LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, game, color);
         connections.send(session, loadGame);
         var message = String.format("%s has joined the game", user.username());
         Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
