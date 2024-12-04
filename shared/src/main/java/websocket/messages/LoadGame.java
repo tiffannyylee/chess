@@ -5,9 +5,9 @@ import model.GameData;
 
 public class LoadGame extends ServerMessage {
     private GameData game;
-    private ChessGame.TeamColor playerColor;
+    private String playerColor;
 
-    public LoadGame(ServerMessageType type, GameData game, ChessGame.TeamColor playerColor) {
+    public LoadGame(ServerMessageType type, GameData game, String playerColor) {
         super(type);
         this.game = game;
         this.playerColor = playerColor;
@@ -22,7 +22,7 @@ public class LoadGame extends ServerMessage {
         this.game = game;
     }
 
-    public ChessGame.TeamColor getPlayerColor() {
+    public String getPlayerColor() {
         return playerColor;
     }
 

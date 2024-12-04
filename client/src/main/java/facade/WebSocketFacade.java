@@ -71,7 +71,7 @@ public class WebSocketFacade extends Endpoint {
     }
 
     //sends connect command serialized
-    public void connect(AuthData authData, int gameID) {
+    public void connect(AuthData authData, int gameID, String playerColor) {
         //send connect request
         //receive game, everyone else receive notification
         try {

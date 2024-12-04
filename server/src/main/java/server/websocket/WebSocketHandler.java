@@ -40,7 +40,7 @@ public class WebSocketHandler {
         switch (command.getCommandType()) {
             case CONNECT -> {
                 if (command instanceof ConnectCommand connectCommand) {
-                    ChessGame.TeamColor color = connectCommand.getColor();
+                    String color = connectCommand.getColor();
                     connect(command.getAuthToken(), session, command.getGameID(), color);
                 } else {
                     System.out.println("Invalid command: CONNECT command is not of type ConnectCommand.");
@@ -81,7 +81,7 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(String authToken, Session session, int gameID, ChessGame.TeamColor color) throws DataAccessException, IOException {
+    private void connect(String authToken, Session session, int gameID, String color) throws DataAccessException, IOException {
         //connect to the connections manager
         //send load game to root
         //broadcast notification that root joined
