@@ -13,6 +13,8 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import service.GameService;
+import service.UserService;
 import websocket.commands.ConnectCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommandDeserializer;
@@ -29,6 +31,7 @@ public class WebSocketHandler {
     ConnectionManager connections = new ConnectionManager();
     private MySQLDataAccess dataAccess = new MySQLDataAccess();
     private Gson gson = new Gson();
+    private GameService gameService = new GameService(new UserService(dataAccess), dataAccess);
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, DataAccessException, InvalidMoveException {
@@ -51,7 +54,7 @@ public class WebSocketHandler {
             case MAKE_MOVE -> {
                 if (command instanceof MakeMoveCommand makeMoveCommand) {
                     ChessMove move = makeMoveCommand.getMove();
-                    String color = makeMoveCommand.getPlayerColor();
+                    ChessGame.TeamColor color = makeMoveCommand.getPlayerColor();
                     makeMove(command.getAuthToken(), session, command.getGameID(), color, move);
                 }
             }
@@ -125,17 +128,49 @@ public class WebSocketHandler {
         connections.broadcast(user.username(), notification);
     }
 
-    private void makeMove(String authToken, Session session, int gameID, String color, ChessMove move) throws DataAccessException, InvalidMoveException {
+    private void makeMove(String authToken, Session session, int gameID, ChessGame.TeamColor playerColor, ChessMove move) throws DataAccessException, InvalidMoveException, IOException {
         //verify move is valid
         //update game to show move and update game in database
         //send a load game to all clients
         //send notification to others about what move was made
         //send notification ab check checkmate or stalemate to all
+        //current user = user
+        //team turn = game.getTeamTurn()
+        //white username gameData.whiteUsername()
+        String user = dataAccess.getAuth(authToken).username();
         GameData gameData = dataAccess.getGame(gameID);
         ChessGame game = gameData.game();
-        if (game.getColorString().equals(color)) {
-            game.makeMove(move);
-            String opposingColor = color.equals("WHITE") ? "BLACK" : "WHITE";
+        try {
+            boolean isWhite = user.equals(gameData.whiteUsername());
+            if (isWhite) {
+                playerColor = ChessGame.TeamColor.WHITE;
+            } else {
+                playerColor = ChessGame.TeamColor.BLACK;
+            }
+            if (game.getTeamTurn().equals(playerColor)) {
+                game.makeMove(move);
+                ChessGame.TeamColor opposingColor = playerColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+
+                if (game.isInCheckmate(opposingColor)) {
+                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s won the game!", user));
+                    connections.broadcast("", notification); //send to everyone
+                } else if (game.isInCheck(opposingColor)) {
+                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s is now in check!", opposingColor.toString()));
+                    connections.broadcast("", notification); //send to everyone
+                } else if (game.isInStalemate(opposingColor)) {
+                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "The game is now in stalemate");
+                    connections.broadcast("", notification); //send to everyone
+                } else {
+                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s just made a move", user));
+                    connections.broadcast(user, notification);
+                }
+                dataAccess.updateGame(gameData);
+                LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, gameData, playerColor.toString());
+                connections.broadcast("", loadGame);
+            }
+        } catch (InvalidMoveException e) {
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "This is not a valid move");
+            connections.send(session, errorMessage);
         }
 
     }

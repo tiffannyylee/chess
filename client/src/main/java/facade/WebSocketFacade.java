@@ -24,7 +24,7 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     ServerMessageObserver messageObserver;
 
-    public WebSocketFacade(String url, ServerMessageObserver messageObserver) throws ResponseException {
+    public WebSocketFacade(String url, ServerMessageObserver messageObserver, ChessGame.TeamColor playerColor) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");

@@ -1,3 +1,4 @@
+import chess.ChessGame;
 import chess.ChessMove;
 import facade.ServerFacade;
 import exception.ResponseException;
@@ -83,6 +84,7 @@ public class PreLoginClient {
         try {
             int gameNumber = Integer.parseInt(parameters[0]); // Game number selected by the user
             String color = parameters[1].toUpperCase(); // Color chosen by the user
+            ChessGame.TeamColor playerColor = color.equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
             if (!color.equals("WHITE") && !color.equals("BLACK")) {
                 return "please enter a valid color (white or black)";
             }
@@ -91,7 +93,7 @@ public class PreLoginClient {
 
             // Calls the server to join the game
             server.joinGame(authData, color, gameID);
-            ws = new WebSocketFacade(serverUrl, messageObserver);
+            ws = new WebSocketFacade(serverUrl, messageObserver, playerColor);
             ws.connect(authData, gameID, color);
             state = State.GAMEPLAY;
             String message = String.format("You have joined the game '%s' as %s!", selectedGame.gameName(), color);
