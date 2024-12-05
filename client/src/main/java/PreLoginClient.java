@@ -82,7 +82,7 @@ public class PreLoginClient {
         try {
             int gameNumber = Integer.parseInt(parameters[0]); // Game number selected by the user
             String color = parameters[1].toUpperCase(); // Color chosen by the user
-            ChessGame.TeamColor playerColor = color.equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            ChessGame.TeamColor playerColor = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
             if (!color.equals("WHITE") && !color.equals("BLACK")) {
                 return "please enter a valid color (white or black)";
             }

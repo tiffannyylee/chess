@@ -147,22 +147,30 @@ public class WebSocketHandler {
             } else {
                 playerColor = ChessGame.TeamColor.BLACK;
             }
+            if (game.getIsOver()) {
+                ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Oops! This game is already over.");
+                connections.send(session, errorMessage);
+                return;
+            }
             if (game.getTeamTurn().equals(playerColor)) {
                 game.makeMove(move);
-                System.out.println("Board state after move: " + game.getBoard());
-                System.out.println("Team turn after move: " + game.getTeamTurn());
+
 
                 ChessGame.TeamColor opposingColor = playerColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
 
                 if (game.isInCheckmate(opposingColor)) {
                     Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s won the game!", user));
                     connections.broadcast("", notification); //send to everyone
+                    game.setIsOver(true);
+                    dataAccess.updateGame(gameData);
                 } else if (game.isInCheck(opposingColor)) {
                     Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s is now in check!", opposingColor.toString()));
                     connections.broadcast("", notification); //send to everyone
                 } else if (game.isInStalemate(opposingColor)) {
-                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "The game is now in stalemate");
+                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "The game is now in stalemate. It's a tie!");
                     connections.broadcast("", notification); //send to everyone
+                    game.setIsOver(true);
+                    dataAccess.updateGame(gameData);
                 } else {
                     Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s just made a move", user));
                     connections.broadcast(user, notification);
@@ -170,7 +178,8 @@ public class WebSocketHandler {
                 dataAccess.updateGame(gameData);
 //                LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, gameData, playerColor.toString());
 //                connections.broadcast("", loadGame);
-                // Send the updated game state to each player with their respective perspectives
+
+                // Reload the game state from the database to ensure it's up-to-date
                 LoadGame loadGameWhite = new LoadGame(
                         ServerMessage.ServerMessageType.LOAD_GAME,
                         gameData,
@@ -187,6 +196,10 @@ public class WebSocketHandler {
                 connections.send(session, loadGameWhite); // Send White's perspective to White
                 connections.broadcast(gameData.whiteUsername(), loadGameBlack); // Send Black's perspective to Black
 
+            } else {
+                //it is not their turn
+                ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Oh no! It is not your turn.");
+                connections.send(session, errorMessage);
             }
         } catch (InvalidMoveException e) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "This is not a valid move");

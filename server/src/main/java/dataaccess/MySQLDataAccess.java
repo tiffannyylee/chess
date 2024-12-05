@@ -232,18 +232,23 @@ public class MySQLDataAccess implements DataAccess {
         } catch (SQLException e) {
             throw new DataAccessException("Failed to check game existence", e);
         }
-        String query = "UPDATE Games SET whiteUsername=?, blackUsername=?, gameName=? WHERE gameID=?";
+        String query = "UPDATE Games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(query)) {
             stmt.setString(1, gameData.whiteUsername());
             stmt.setString(2, gameData.blackUsername());
             stmt.setString(3, gameData.gameName());
-            stmt.setInt(4, gameData.gameID());
+            stmt.setString(4, serializeGame(gameData.game()));
+            stmt.setInt(5, gameData.gameID());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException("Failed to update game", e);
         }
 
+    }
+
+    private String serializeGame(ChessGame game) {
+        return new Gson().toJson(game);
     }
 
     private final String[] createStatements = {

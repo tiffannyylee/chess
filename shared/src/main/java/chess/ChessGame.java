@@ -15,6 +15,8 @@ public class ChessGame {
     private ChessGame.TeamColor currentTeamColor;
     private ChessBoard currentBoard;
 
+    private boolean isOver;
+
     public ChessGame() {
         currentTeamColor = TeamColor.WHITE;
         currentBoard = new ChessBoard();
@@ -30,6 +32,14 @@ public class ChessGame {
 
     public String getColorString() {
         return currentTeamColor.toString();
+    }
+
+    public void setIsOver(boolean isOver) {
+        this.isOver = isOver;
+    }
+
+    public boolean getIsOver() {
+        return isOver;
     }
 
     /**
