@@ -1,13 +1,14 @@
 package facade;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exception.ResponseException;
 import model.AuthData;
 import websocket.commands.ConnectCommand;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 import websocket.messages.ServerMessageDeserializer;
 
@@ -23,12 +24,17 @@ public class WebSocketFacade extends Endpoint {
     //write user command messages that send to the server
     Session session;
     ServerMessageObserver messageObserver;
+    private String authToken;
+    private int gameID;
+    private ChessGame.TeamColor playerColor;
+
 
     public WebSocketFacade(String url, ServerMessageObserver messageObserver, ChessGame.TeamColor playerColor) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
             this.messageObserver = messageObserver;
+            this.playerColor = playerColor;
 
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(ServerMessage.class, new ServerMessageDeserializer())
@@ -76,8 +82,10 @@ public class WebSocketFacade extends Endpoint {
         //send connect request
         //receive game, everyone else receive notification
         try {
+            this.authToken = authData.authToken(); // Store authToken
+            this.gameID = gameID;                 // Store gameID
             // Create a connect command message
-            ConnectCommand connectMessage = new ConnectCommand(UserGameCommand.CommandType.CONNECT, authData.authToken(), gameID, playerColor);
+            ConnectCommand connectMessage = new ConnectCommand(UserGameCommand.CommandType.CONNECT, this.authToken, this.gameID, playerColor);
 
             // Convert the message to JSON
             String jsonMessage = new Gson().toJson(connectMessage);
@@ -91,7 +99,15 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void makeMove() {
+    public void makeMove(ChessMove chessMove) {
+        try {
+            MakeMoveCommand makeMoveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, chessMove, playerColor);
+            String jsonMessage = new Gson().toJson(makeMoveCommand);
+            session.getBasicRemote().sendText(jsonMessage);
+            System.out.println("Sent make move message (this is ws facade)");
+        } catch (IOException e) {
+            System.err.println("Error sending move message: " + e.getMessage());
+        }
     }
 
     public void leave() {

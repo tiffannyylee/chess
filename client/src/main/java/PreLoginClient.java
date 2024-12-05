@@ -1,5 +1,4 @@
-import chess.ChessGame;
-import chess.ChessMove;
+import chess.*;
 import facade.ServerFacade;
 import exception.ResponseException;
 import facade.ServerMessageObserver;
@@ -9,7 +8,6 @@ import model.GameData;
 import model.UserData;
 
 import java.io.PrintStream;
-import java.net.http.WebSocket;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,7 +42,7 @@ public class PreLoginClient {
                 case "play" -> playGame(parameters);
                 case "redraw" -> redrawBoard();
                 case "leave" -> leaveGame();
-                case "move" -> makeMove();
+                case "move" -> makeMove(parameters);
                 case "resign" -> resignGame();
                 case "highlight" -> highlightMoves();
                 case "quit" -> "quit";
@@ -242,9 +240,42 @@ public class PreLoginClient {
 //      ws.leave
 //    }
 //
-//    public ChessMove makeMove() {
-//      ws.makemove
-//    }
+    private String makeMove(String... parameters) {
+        try {
+            if (parameters.length == 3 && parameters[0].matches("[a-h][1-8]") && parameters[1].matches("[a-h][1-8]")) {
+                //promotion was entered
+                ChessPosition from = new ChessPosition(parameters[0].charAt(1), parameters[0].charAt(0)); //a1 a is col 1 is row
+                ChessPosition to = new ChessPosition(parameters[1].charAt(1), parameters[1].charAt(0));
+                ChessPiece.PieceType promotion = getPiece(parameters[2]);
+                ws.makeMove(new ChessMove(from, to, promotion));
+                return "good job move made";
+            } else if (parameters.length == 2) {
+                ChessPosition from = new ChessPosition(parameters[0].charAt(1), parameters[0].charAt(0)); //a1 a is col 1 is row
+                ChessPosition to = new ChessPosition(parameters[1].charAt(1), parameters[1].charAt(0));
+                ws.makeMove(new ChessMove(from, to, null));
+                return "good job move made";
+            } else {
+                return "Please enter a from and to coordinate!";
+            }
+        } catch (Exception e) {
+            return "failed move";
+        }
+    }
+
+    private void getUser() {
+
+    }
+
+    private ChessPiece.PieceType getPiece(String parameter) {
+        return switch (parameter.toUpperCase()) {
+            case "QUEEN" -> ChessPiece.PieceType.QUEEN;
+            case "BISHOP" -> ChessPiece.PieceType.BISHOP;
+            case "ROOK" -> ChessPiece.PieceType.ROOK;
+            case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
+            case "PAWN" -> ChessPiece.PieceType.PAWN;
+            default -> null;
+        };
+    }
 //
 //    public void resign() {
 //      ws.resign
@@ -280,7 +311,7 @@ public class PreLoginClient {
             return """
                     redraw - to redraw the chess board
                     leave - to leave the game
-                    move - to make a move
+                    move <from> <to> <promotion> - to make a move (example: move a1 b1)
                     resign - to forfeit the game
                     highlight - to highlight legal moves for a piece
                     help - to see all possible commands
