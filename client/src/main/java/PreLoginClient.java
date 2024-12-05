@@ -244,14 +244,14 @@ public class PreLoginClient {
         try {
             if (parameters.length == 3 && parameters[0].matches("[a-h][1-8]") && parameters[1].matches("[a-h][1-8]")) {
                 //promotion was entered
-                ChessPosition from = new ChessPosition(parameters[0].charAt(1), parameters[0].charAt(0)); //a1 a is col 1 is row
-                ChessPosition to = new ChessPosition(parameters[1].charAt(1), parameters[1].charAt(0));
+                ChessPosition from = new ChessPosition(parameters[0].charAt(1) - '0', parameters[0].charAt(0) - 'a' + 1); //a1 a is col 1 is row
+                ChessPosition to = new ChessPosition(parameters[1].charAt(1) - '0', parameters[1].charAt(0) - 'a' + 1); //-0 so it renders char
                 ChessPiece.PieceType promotion = getPiece(parameters[2]);
                 ws.makeMove(new ChessMove(from, to, promotion));
                 return "good job move made";
             } else if (parameters.length == 2) {
-                ChessPosition from = new ChessPosition(parameters[0].charAt(1), parameters[0].charAt(0)); //a1 a is col 1 is row
-                ChessPosition to = new ChessPosition(parameters[1].charAt(1), parameters[1].charAt(0));
+                ChessPosition from = new ChessPosition(parameters[0].charAt(1) - '0', parameters[0].charAt(0) - 'a' + 1); //a1 a is col 1 is row
+                ChessPosition to = new ChessPosition(parameters[1].charAt(1) - '0', parameters[1].charAt(0) - 'a' + 1);
                 ws.makeMove(new ChessMove(from, to, null));
                 return "good job move made";
             } else {
