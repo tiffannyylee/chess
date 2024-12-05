@@ -2,6 +2,7 @@ package server.websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPosition;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,11 +18,8 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
-import websocket.commands.ConnectCommand;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.UserGameCommandDeserializer;
+import websocket.commands.*;
 import websocket.messages.LoadGame;
-import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
@@ -60,7 +58,11 @@ public class WebSocketHandler {
                     makeMove(command.getAuthToken(), session, command.getGameID(), color, move);
                 }
             }
-            case LEAVE -> leave();
+            case LEAVE -> {
+                if (command instanceof LeaveCommand leaveCommand) {
+                    leave(session, command.getAuthToken(), command.getGameID());
+                }
+            }
             case RESIGN -> resign();
         }
 
@@ -123,23 +125,22 @@ public class WebSocketHandler {
             connections.send(session, errorMessage);
             return;
         }
-        LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, game, color);
+        LoadGame loadGame;
+        String message;
+        if (color == null) {
+            loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, game, "white");
+            message = String.format("%s is observing the game", user.username());
+        } else {
+            loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, game, color);
+            message = String.format("%s has joined the game as %s", user.username(), color);
+        }
         connections.send(session, loadGame);
-        var message = String.format("%s has joined the game", user.username());
+        //var message = String.format("%s has joined the game", user.username());
         Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(user.username(), notification);
     }
 
     private void makeMove(String authToken, Session session, int gameID, ChessGame.TeamColor playerColor, ChessMove move) throws DataAccessException, InvalidMoveException, IOException {
-        //verify move is valid
-        //update game to show move and update game in database
-        //send a load game to all clients
-        //send notification to others about what move was made
-        //send notification ab check checkmate or stalemate to all
-        //current user = user
-        //team turn = game.getTeamTurn()
-        //white username gameData.whiteUsername()
-
         try {
             String user = dataAccess.getAuth(authToken).username();
             GameData gameData = dataAccess.getGame(gameID);
@@ -157,18 +158,19 @@ public class WebSocketHandler {
             }
             if (game.getTeamTurn().equals(playerColor)) {
                 game.makeMove(move);
-
-
                 ChessGame.TeamColor opposingColor = playerColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
-
-                Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s just made a move", user));
+                ChessPosition from = move.getStartPosition();
+                ChessPosition to = move.getEndPosition();
+                Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s just moved from %s to %s ", user, from, to));
                 connections.broadcast(user, notification);
 
                 if (game.isInCheckmate(opposingColor)) {
-                    Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s won the game!", user));
+                    //change to players name
+                    Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s is in checkmate!", opposingColor));
                     connections.broadcast("", notif); //send to everyone
                     game.setIsOver(true);
                 } else if (game.isInCheck(opposingColor)) {
+                    //change to players name
                     Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s is now in check!", opposingColor.toString()));
                     connections.broadcast("", notif); //send to everyone
                 } else if (game.isInStalemate(opposingColor)) {
@@ -176,10 +178,6 @@ public class WebSocketHandler {
                     connections.broadcast("", notif); //send to everyone
                     game.setIsOver(true);
                 }
-//                LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, gameData, playerColor.toString());
-//                connections.broadcast("", loadGame);
-
-                // Reload the game state from the database to ensure it's up-to-date
                 LoadGame loadGameWhite = new LoadGame(
                         ServerMessage.ServerMessageType.LOAD_GAME,
                         gameData,
@@ -191,15 +189,10 @@ public class WebSocketHandler {
                         gameData,
                         ChessGame.TeamColor.BLACK.toString()
                 );
-
-// Send perspective-specific messages
                 connections.send(session, loadGameWhite); // Send White's perspective to White
                 connections.broadcast(user, loadGameBlack); // Send Black's perspective to Black
                 dataAccess.updateGame(gameData);
-
-
             } else {
-                //it is not their turn
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Oh no! It is not your turn.");
                 connections.send(session, errorMessage);
             }
@@ -213,10 +206,14 @@ public class WebSocketHandler {
 
     }
 
-    private void leave() {
+    private void leave(Session session, String authToken, int gameID) throws DataAccessException, IOException {
         //remove client from connections
         //update game in database
         //send notification to all players and observers that root left
+        String user = dataAccess.getAuth(authToken).username();
+        Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s has left the game :(", user));
+        connections.broadcast(user, notification);
+        connections.delete(user);
     }
 
     private void resign() {
