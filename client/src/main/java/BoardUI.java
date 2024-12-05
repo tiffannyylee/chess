@@ -176,7 +176,7 @@ public class BoardUI {
                     String color = (row + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
 
                     if (h == SQUARE_HEIGHT / 2) {
-                        out.print(color + board[isWhitePerspective ? BOARD_SIZE - row - 1 : row][isWhitePerspective ? col : BOARD_SIZE - col - 1] + EMPTY_SQUARE + RESET_COLOR);
+                        out.print(color + board[row][displayCol] + EMPTY_SQUARE + RESET_COLOR);
                     } else {
                         out.print(color + "     " + RESET_COLOR);
                     }
