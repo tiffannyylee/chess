@@ -102,7 +102,7 @@ public class Repl implements ServerMessageObserver {
         }
     }
 
-    private String[][] convertBoardToStringArray(ChessBoard board, boolean isWhitePerspective) {
+    private String[][] convertBoardToStringArray(ChessBoard board, boolean isBlackPerspective) {
 //        int size = 8;
 //        String[][] boardArray = new String[size][size];
 //
@@ -126,8 +126,8 @@ public class Repl implements ServerMessageObserver {
 
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
-                int adjustedRow = isWhitePerspective ? row : size - 1 - row;
-                int adjustedCol = isWhitePerspective ? col : size - 1 - col;
+                int adjustedRow = isBlackPerspective ? row : size - 1 - row;
+                int adjustedCol = isBlackPerspective ? col : size - 1 - col;
 
                 ChessPiece piece = board.getPiece(new ChessPosition(adjustedRow + 1, adjustedCol + 1));
                 boardArray[row][col] = piece != null ? convertPieceToUnicode(piece) : "   ";
@@ -142,10 +142,10 @@ public class Repl implements ServerMessageObserver {
         var out = new PrintStream(System.out);
         String color = message.getPlayerColor();
         ChessBoard board = message.getGame().game().getBoard();
-        boolean isWhitePerspective = Objects.equals(message.getPlayerColor(), "WHITE");
-        String[][] boardArray = convertBoardToStringArray(board, isWhitePerspective);
+        boolean isBlackPerspective = Objects.equals(message.getPlayerColor(), "BLACK");
+        String[][] boardArray = convertBoardToStringArray(board, isBlackPerspective);
         //BoardUI.drawDynamicChessBoard(out, boardArray, isWhitePerspective);
-        BoardUI.drawChessBoard2(out, boardArray, isWhitePerspective);
+        BoardUI.drawChessBoard(out, boardArray, isBlackPerspective);
         //System.out.println("Received Load Game Message: " + message.getGame().game().getBoard());
         // Update the game state with the new game state (e.g., render the board)
         // You might need to update your game UI or internal state here
