@@ -5,8 +5,10 @@ import chess.ChessMove;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
 import dataaccess.MySQLDataAccess;
+import dataaccess.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -137,10 +139,11 @@ public class WebSocketHandler {
         //current user = user
         //team turn = game.getTeamTurn()
         //white username gameData.whiteUsername()
-        String user = dataAccess.getAuth(authToken).username();
-        GameData gameData = dataAccess.getGame(gameID);
-        ChessGame game = gameData.game();
+
         try {
+            String user = dataAccess.getAuth(authToken).username();
+            GameData gameData = dataAccess.getGame(gameID);
+            ChessGame game = gameData.game();
             boolean isWhite = user.equals(gameData.whiteUsername());
             if (isWhite) {
                 playerColor = ChessGame.TeamColor.WHITE;
@@ -158,24 +161,21 @@ public class WebSocketHandler {
 
                 ChessGame.TeamColor opposingColor = playerColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
 
+                Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s just made a move", user));
+                connections.broadcast(user, notification);
+
                 if (game.isInCheckmate(opposingColor)) {
-                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s won the game!", user));
-                    connections.broadcast("", notification); //send to everyone
+                    Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s won the game!", user));
+                    connections.broadcast("", notif); //send to everyone
                     game.setIsOver(true);
-                    dataAccess.updateGame(gameData);
                 } else if (game.isInCheck(opposingColor)) {
-                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s is now in check!", opposingColor.toString()));
-                    connections.broadcast("", notification); //send to everyone
+                    Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s is now in check!", opposingColor.toString()));
+                    connections.broadcast("", notif); //send to everyone
                 } else if (game.isInStalemate(opposingColor)) {
-                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "The game is now in stalemate. It's a tie!");
-                    connections.broadcast("", notification); //send to everyone
+                    Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "The game is now in stalemate. It's a tie!");
+                    connections.broadcast("", notif); //send to everyone
                     game.setIsOver(true);
-                    dataAccess.updateGame(gameData);
-                } else {
-                    Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s just made a move", user));
-                    connections.broadcast(user, notification);
                 }
-                dataAccess.updateGame(gameData);
 //                LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, gameData, playerColor.toString());
 //                connections.broadcast("", loadGame);
 
@@ -194,7 +194,9 @@ public class WebSocketHandler {
 
 // Send perspective-specific messages
                 connections.send(session, loadGameWhite); // Send White's perspective to White
-                connections.broadcast(gameData.whiteUsername(), loadGameBlack); // Send Black's perspective to Black
+                connections.broadcast(user, loadGameBlack); // Send Black's perspective to Black
+                dataAccess.updateGame(gameData);
+
 
             } else {
                 //it is not their turn
@@ -203,6 +205,9 @@ public class WebSocketHandler {
             }
         } catch (InvalidMoveException e) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "This is not a valid move");
+            connections.send(session, errorMessage);
+        } catch (UnauthorizedException e) {
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Looks like you are not authorized. uh oh!");
             connections.send(session, errorMessage);
         }
 
