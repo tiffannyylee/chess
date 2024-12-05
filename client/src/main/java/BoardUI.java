@@ -50,6 +50,46 @@ public class BoardUI {
 
     }
 
+    public static void drawChessBoard2(PrintStream out, String[][] board, boolean isWhitePerspective) {
+        drawColumnHeaders(out, isWhitePerspective);
+
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            // Flip row index for different perspectives
+            int actualRow = isWhitePerspective ? BOARD_SIZE - row - 1 : row;
+            int displayRow = isWhitePerspective ? row + 1 : BOARD_SIZE - row;
+
+            // Repeat each square row to create a square
+            for (int h = 0; h < SQUARE_HEIGHT; h++) {
+                // Add row numbers on the left side only in the middle of the square height
+                if (h == SQUARE_HEIGHT / 2) {
+                    out.printf(" %d  ", displayRow);
+                } else {
+                    out.print("    ");
+                }
+
+                // Draw each column in the row
+                for (int col = 0; col < BOARD_SIZE; col++) {
+                    int displayCol = isWhitePerspective ? col : BOARD_SIZE - col - 1;
+                    String color = (row + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
+
+                    if (h == SQUARE_HEIGHT / 2) {  // Middle row to display piece
+                        out.print(color + board[actualRow][displayCol] + EMPTY_SQUARE + RESET_COLOR);
+                    } else {  // Empty padding rows for height
+                        out.print(color + "     " + RESET_COLOR);
+                    }
+                }
+
+                // Add row numbers on the right side
+                if (h == SQUARE_HEIGHT / 2) {
+                    out.printf("  %d", displayRow);
+                }
+                out.println();
+            }
+        }
+
+        drawColumnHeaders(out, isWhitePerspective);
+    }
+
 
     public static void drawChessBoard(PrintStream out, String[][] board, boolean isWhitePerspective) {
         drawColumnHeaders(out, isWhitePerspective);

@@ -149,6 +149,9 @@ public class WebSocketHandler {
             }
             if (game.getTeamTurn().equals(playerColor)) {
                 game.makeMove(move);
+                System.out.println("Board state after move: " + game.getBoard());
+                System.out.println("Team turn after move: " + game.getTeamTurn());
+
                 ChessGame.TeamColor opposingColor = playerColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
 
                 if (game.isInCheckmate(opposingColor)) {
@@ -165,8 +168,25 @@ public class WebSocketHandler {
                     connections.broadcast(user, notification);
                 }
                 dataAccess.updateGame(gameData);
-                LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, gameData, playerColor.toString());
-                connections.broadcast("", loadGame);
+//                LoadGame loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, gameData, playerColor.toString());
+//                connections.broadcast("", loadGame);
+                // Send the updated game state to each player with their respective perspectives
+                LoadGame loadGameWhite = new LoadGame(
+                        ServerMessage.ServerMessageType.LOAD_GAME,
+                        gameData,
+                        ChessGame.TeamColor.WHITE.toString()
+                );
+
+                LoadGame loadGameBlack = new LoadGame(
+                        ServerMessage.ServerMessageType.LOAD_GAME,
+                        gameData,
+                        ChessGame.TeamColor.BLACK.toString()
+                );
+
+// Send perspective-specific messages
+                connections.send(session, loadGameWhite); // Send White's perspective to White
+                connections.broadcast(gameData.whiteUsername(), loadGameBlack); // Send Black's perspective to Black
+
             }
         } catch (InvalidMoveException e) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "This is not a valid move");
