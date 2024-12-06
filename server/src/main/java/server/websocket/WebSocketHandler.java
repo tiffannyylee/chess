@@ -65,7 +65,8 @@ public class WebSocketHandler {
             }
             case RESIGN -> {
                 if (command instanceof ResignCommand resignCommand) {
-                    resign(session, command.getAuthToken(), command.getGameID());
+                    String color = resignCommand.getColor();
+                    resign(session, command.getAuthToken(), command.getGameID(), color);
                 }
             }
         }
@@ -132,7 +133,7 @@ public class WebSocketHandler {
         }
         LoadGame loadGame;
         String message;
-        if (color == null) {
+        if (!user.username().equals(game.whiteUsername()) && !user.username().equals(game.blackUsername())) {
             loadGame = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, game, "white");
             message = String.format("%s is observing the game", user.username());
         } else {
@@ -232,19 +233,30 @@ public class WebSocketHandler {
         connections.delete(user);
     }
 
-    private void resign(Session session, String authToken, int gameID) throws DataAccessException, IOException {
+    private void resign(Session session, String authToken, int gameID, String color) throws DataAccessException, IOException {
         //server marks the game as over
         //game is updated in the database
         //sends notification to all players that root resigned. both players and observers
         String user = dataAccess.getAuth(authToken).username();
         GameData gameData = dataAccess.getGame(gameID);
         ChessGame game = gameData.game();
-        ChessGame.TeamColor color = user.equals(gameData.whiteUsername()) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-        String opponentUsername = color == ChessGame.TeamColor.WHITE ? gameData.blackUsername() : gameData.whiteUsername();
 
+
+        if (!user.equals(gameData.whiteUsername()) && !user.equals(gameData.blackUsername())) {
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "You are observing!");
+            connections.send(session, error);
+            return;
+        }
+        ChessGame.TeamColor playerColor = user.equals(gameData.whiteUsername()) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+        String opponentUsername = playerColor == ChessGame.TeamColor.WHITE ? gameData.blackUsername() : gameData.whiteUsername();
+        if (game.getIsOver()) {
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "This is over");
+            connections.send(session, error);
+            return;
+        }
         gameData.game().setIsOver(true);
         dataAccess.updateGame(gameData);
         Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s has resigned. The game is over.", user));
-        connections.broadcast(user, notification);
+        connections.broadcast("", notification);
     }
 }
