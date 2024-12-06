@@ -50,11 +50,6 @@ public class Repl implements ServerMessageObserver {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
-    //    @Override
-//    public void notify(ServerMessage message) {
-//        System.out.println(RED + message.toString());
-//        printPrompt();
-//    }
     @Override
     public void notify(ServerMessage serverMessage) {
         // Based on the type of message, take the appropriate action
@@ -103,24 +98,6 @@ public class Repl implements ServerMessageObserver {
     }
 
     private String[][] convertBoardToStringArray(ChessBoard board, boolean isBlackPerspective) {
-//        int size = 8;
-//        String[][] boardArray = new String[size][size];
-//
-//        int rowOffset = isWhiteTurn ? 0 : 7; // For White, row 1 is at index 0, for Black, row 8 is at index 0.
-//
-//        for (int row = 0; row < 8; row++) {
-//            for (int col = 0; col < 8; col++) {
-//                int adjustedRow = isWhiteTurn ? row : 7 - row; // Adjust row based on perspective
-//                ChessPiece piece = board.getPiece(new ChessPosition(adjustedRow + 1, col + 1));
-//                if (piece != null) {
-//                    boardArray[row][col] = convertPieceToUnicode(piece);
-//                } else {
-//                    boardArray[row][col] = "   "; // Empty square
-//                }
-//            }
-//        }
-//
-//        return boardArray;
         int size = 8; // Chess board size
         String[][] boardArray = new String[size][size];
 
@@ -145,10 +122,6 @@ public class Repl implements ServerMessageObserver {
         boolean isBlackPerspective = Objects.equals(message.getPlayerColor(), "BLACK");
         String[][] boardArray = convertBoardToStringArray(board, isBlackPerspective);
         BoardUI.drawDynamicChessBoard(out, boardArray, isBlackPerspective);
-        //BoardUI.drawChessBoard(out, boardArray, isBlackPerspective);
-        //System.out.println("Received Load Game Message: " + message.getGame().game().getBoard());
-        // Update the game state with the new game state (e.g., render the board)
-        // You might need to update your game UI or internal state here
     }
 
     // Handle the NOTIFICATION message

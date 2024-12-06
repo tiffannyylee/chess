@@ -42,12 +42,5 @@ public class ConnectionManager {
         String jsonMessage = gson.toJson(message);
         session.getRemote().sendString(jsonMessage);
         System.out.println("Sent message to client: " + jsonMessage);
-//        Connection connection = connections.get(userName);
-//        String jsonMessage = gson.toJson(message);
-//        if (connection != null && connection.session.isOpen()) {
-//            connection.send(jsonMessage);
-//        } else {
-//            System.err.println("Failed to send message to " + userName + ": Connection is closed or does not exist.");
-//        }
     }
 }
