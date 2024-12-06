@@ -211,7 +211,18 @@ public class WebSocketHandler {
         //update game in database
         //send notification to all players and observers that root left
         String user = dataAccess.getAuth(authToken).username();
+        GameData gameData = dataAccess.getGame(gameID);
+        ChessGame.TeamColor color = user.equals(gameData.whiteUsername()) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
         Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s has left the game :(", user));
+        GameData updatedGameData;
+        if (color == ChessGame.TeamColor.WHITE) {
+            updatedGameData = new GameData(gameID, null, gameData.blackUsername(), gameData.gameName(), gameData.game());
+        } else {
+            updatedGameData = new GameData(gameID, gameData.whiteUsername(), null, gameData.gameName(), gameData.game());
+        }
+
+        // Update the game in the database
+        dataAccess.updateGame(updatedGameData);
         connections.broadcast(user, notification);
         connections.delete(user);
     }
