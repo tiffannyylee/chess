@@ -63,8 +63,13 @@ public class WebSocketHandler {
                     leave(session, command.getAuthToken(), command.getGameID());
                 }
             }
-            case RESIGN -> resign();
+            case RESIGN -> {
+                if (command instanceof ResignCommand resignCommand) {
+                    resign(session, command.getAuthToken(), command.getGameID());
+                }
+            }
         }
+
 
     }
 
@@ -227,10 +232,19 @@ public class WebSocketHandler {
         connections.delete(user);
     }
 
-    private void resign() {
+    private void resign(Session session, String authToken, int gameID) throws DataAccessException, IOException {
         //server marks the game as over
         //game is updated in the database
         //sends notification to all players that root resigned. both players and observers
-    }
+        String user = dataAccess.getAuth(authToken).username();
+        GameData gameData = dataAccess.getGame(gameID);
+        ChessGame game = gameData.game();
+        ChessGame.TeamColor color = user.equals(gameData.whiteUsername()) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+        String opponentUsername = color == ChessGame.TeamColor.WHITE ? gameData.blackUsername() : gameData.whiteUsername();
 
+        gameData.game().setIsOver(true);
+        dataAccess.updateGame(gameData);
+        Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s has resigned. The game is over.", user));
+        connections.broadcast(user, notification);
+    }
 }
