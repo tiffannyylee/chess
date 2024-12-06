@@ -124,7 +124,7 @@ public class WebSocketHandler {
 //            ErrorMessage message = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error : bad auth");
 //            connections.send(session, message);
         }
-        connections.add(user.username(), session);
+        connections.add(user.username(), session, gameID);
         GameData game = dataAccess.getGame(gameID);
         if (game == null) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error : game not found");
@@ -143,7 +143,7 @@ public class WebSocketHandler {
         connections.send(session, loadGame);
         //var message = String.format("%s has joined the game", user.username());
         Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(user.username(), notification);
+        connections.broadcast(gameID, user.username(), notification);
     }
 
     private void makeMove(String authToken, Session session, int gameID, ChessGame.TeamColor playerColor, ChessMove move) throws DataAccessException, InvalidMoveException, IOException {
@@ -168,20 +168,20 @@ public class WebSocketHandler {
                 ChessPosition from = move.getStartPosition();
                 ChessPosition to = move.getEndPosition();
                 Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s just moved from %s to %s ", user, from, to));
-                connections.broadcast(user, notification);
+                connections.broadcast(gameID, user, notification);
 
                 if (game.isInCheckmate(opposingColor)) {
                     //change to players name
                     Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s is in checkmate!", opposingColor));
-                    connections.broadcast("", notif); //send to everyone
+                    connections.broadcast(gameID, "", notif); //send to everyone
                     game.setIsOver(true);
                 } else if (game.isInCheck(opposingColor)) {
                     //change to players name
                     Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s is now in check!", opposingColor.toString()));
-                    connections.broadcast("", notif); //send to everyone
+                    connections.broadcast(gameID, "", notif); //send to everyone
                 } else if (game.isInStalemate(opposingColor)) {
                     Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "The game is now in stalemate. It's a tie!");
-                    connections.broadcast("", notif); //send to everyone
+                    connections.broadcast(gameID, "", notif); //send to everyone
                     game.setIsOver(true);
                 }
                 LoadGame loadGameWhite = new LoadGame(
@@ -196,7 +196,7 @@ public class WebSocketHandler {
                         ChessGame.TeamColor.BLACK.toString()
                 );
                 connections.send(session, loadGameWhite); // Send White's perspective to White
-                connections.broadcast(user, loadGameBlack); // Send Black's perspective to Black
+                connections.broadcast(gameID, user, loadGameBlack); // Send Black's perspective to Black
                 dataAccess.updateGame(gameData);
             } else {
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Oh no! It is not your turn.");
@@ -229,7 +229,7 @@ public class WebSocketHandler {
 
         // Update the game in the database
         dataAccess.updateGame(updatedGameData);
-        connections.broadcast(user, notification);
+        connections.broadcast(gameID, user, notification);
         connections.delete(user);
     }
 
@@ -257,6 +257,6 @@ public class WebSocketHandler {
         gameData.game().setIsOver(true);
         dataAccess.updateGame(gameData);
         Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s has resigned. The game is over.", user));
-        connections.broadcast("", notification);
+        connections.broadcast(gameID, "", notification);
     }
 }
