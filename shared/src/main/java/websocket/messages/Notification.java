@@ -15,6 +15,6 @@ public class Notification extends ServerMessage {
 
     @Override
     public String toString() {
-        return STR."ServerMessage{type='\{serverMessageType}', content='\{message}'}";
+        return String.format("ServerMessage{type='%s', content='%s'}", serverMessageType, message);
     }
 }
