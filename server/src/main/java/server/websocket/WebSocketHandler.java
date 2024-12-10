@@ -143,11 +143,11 @@ public class WebSocketHandler {
             GameData gameData = dataAccess.getGame(gameID);
             ChessGame game = gameData.game();
             boolean isWhite = user.equals(gameData.whiteUsername());
-            if (isWhite) {
-                color = ChessGame.TeamColor.WHITE;
-            } else {
-                color = ChessGame.TeamColor.BLACK;
-            }
+//            if (isWhite) {
+//                color = ChessGame.TeamColor.WHITE;
+//            } else {
+//                color = ChessGame.TeamColor.BLACK;
+//            }
             if (game.getIsOver()) {
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Oops! This game is already over.");
                 connections.send(sess, errorMessage);

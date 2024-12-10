@@ -33,8 +33,8 @@ public class BoardUI {
             {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK}
     };
 
-    public static void drawColumnHeaders(PrintStream out, boolean isWhitePerspective) {
-        if (!isWhitePerspective || isWhitePerspective) {
+    public static void drawColumnHeaders(PrintStream out, boolean isBlackPerspective) {
+        if (!isBlackPerspective) {
             out.print("    ");
             for (char col = 'a'; col < 'i'; col++) {
                 out.printf("  %c  ", col);
@@ -42,14 +42,14 @@ public class BoardUI {
             out.println();
         } else {
             out.print("    ");
-            for (char col = 'a'; col < 'i'; col--) {
+            for (char col = 'h'; col >= 'a'; col--) {
                 out.printf("  %c  ", col);
             }
             out.println();
         }
 
     }
-    
+
 
     public static String[][] initializeBoard(boolean isWhitePerspective) {
         return isWhitePerspective ? new String[][]{
@@ -75,10 +75,10 @@ public class BoardUI {
         };
     }
 
-    public static void drawDynamicChessBoard(PrintStream out, String[][] board, boolean isWhitePerspective) {
-        drawColumnHeaders(out, isWhitePerspective);
+    public static void drawDynamicChessBoard(PrintStream out, String[][] board, boolean isBlackPerspective) {
+        drawColumnHeaders(out, isBlackPerspective);
         for (int row = 0; row < BOARD_SIZE; row++) {
-            int displayRow = isWhitePerspective ? BOARD_SIZE - row : row + 1;
+            int displayRow = isBlackPerspective ? BOARD_SIZE - row : row + 1;
 
             for (int h = 0; h < SQUARE_HEIGHT; h++) {
                 if (h == SQUARE_HEIGHT / 2) {
@@ -88,7 +88,7 @@ public class BoardUI {
                 }
 
                 for (int col = 0; col < BOARD_SIZE; col++) {
-                    int displayCol = isWhitePerspective ? col : BOARD_SIZE - col - 1;
+                    int displayCol = isBlackPerspective ? col : BOARD_SIZE - col - 1;
                     String color = (row + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
 
                     if (h == SQUARE_HEIGHT / 2) {
@@ -105,7 +105,7 @@ public class BoardUI {
             }
         }
 
-        drawColumnHeaders(out, isWhitePerspective);
+        drawColumnHeaders(out, isBlackPerspective);
     }
 
     public static void main(String[] args) {
@@ -113,10 +113,6 @@ public class BoardUI {
 
         String[][] boardWhitePerspective = initializeBoard(true); // White's view
         String[][] boardBlackPerspective = initializeBoard(false); // Black's view
-
-        out.println("White Perspective:");
-
-        out.println("\nBlack Perspective:");
 
         out.println("White Perspective:");
         drawDynamicChessBoard(out, boardWhitePerspective, true);
