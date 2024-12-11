@@ -79,6 +79,8 @@ public class BoardUI {
         drawColumnHeaders(out, isBlackPerspective);
         for (int row = 0; row < BOARD_SIZE; row++) {
             int displayRow = isBlackPerspective ? BOARD_SIZE - row : row + 1;
+            int boardRow = isBlackPerspective ? BOARD_SIZE - row - 1 : row;
+
 
             for (int h = 0; h < SQUARE_HEIGHT; h++) {
                 if (h == SQUARE_HEIGHT / 2) {
@@ -89,10 +91,10 @@ public class BoardUI {
 
                 for (int col = 0; col < BOARD_SIZE; col++) {
                     int displayCol = isBlackPerspective ? col : BOARD_SIZE - col - 1;
-                    String color = (row + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
+                    String color = (boardRow + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
 
                     if (h == SQUARE_HEIGHT / 2) {
-                        out.print(color + board[row][displayCol] + EMPTY_SQUARE + RESET_COLOR);
+                        out.print(color + board[boardRow][displayCol] + EMPTY_SQUARE + RESET_COLOR);
                     } else {
                         out.print(color + "     " + RESET_COLOR);
                     }

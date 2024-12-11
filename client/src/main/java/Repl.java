@@ -116,12 +116,17 @@ public class Repl implements ServerMessageObserver {
 
     // Handle the LOAD_GAME message
     private void handleLoadGame(LoadGame message) {
-        var out = new PrintStream(System.out);
+//        var out = new PrintStream(System.out);
+        BoardPrinter boardPrinter = new BoardPrinter(message.getGame().game());
+        ChessGame.TeamColor teamColor;
         String color = message.getPlayerColor();
-        ChessBoard board = message.getGame().game().getBoard();
-        boolean isBlackPerspective = Objects.equals(message.getPlayerColor(), "BLACK");
-        String[][] boardArray = convertBoardToStringArray(board, isBlackPerspective);
-        BoardUI.drawDynamicChessBoard(out, boardArray, isBlackPerspective);
+        teamColor = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+//        ChessBoard board = message.getGame().game().getBoard();
+//        boolean isBlackPerspective = Objects.equals(message.getPlayerColor(), "BLACK");
+//        String[][] boardArray = convertBoardToStringArray(board, isBlackPerspective);
+//        BoardUI.drawDynamicChessBoard(out, boardArray, isBlackPerspective);
+        boardPrinter.printBoard(teamColor, null);
+
     }
 
     // Handle the NOTIFICATION message

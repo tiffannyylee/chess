@@ -143,11 +143,11 @@ public class WebSocketHandler {
             GameData gameData = dataAccess.getGame(gameID);
             ChessGame game = gameData.game();
             boolean isWhite = user.equals(gameData.whiteUsername());
-//            if (isWhite) {
-//                color = ChessGame.TeamColor.WHITE;
-//            } else {
-//                color = ChessGame.TeamColor.BLACK;
-//            }
+            if (isWhite && color == null) {
+                color = ChessGame.TeamColor.WHITE;
+            } else {
+                color = ChessGame.TeamColor.BLACK;
+            }
             if (game.getIsOver()) {
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Oops! This game is already over.");
                 connections.send(sess, errorMessage);
@@ -189,8 +189,13 @@ public class WebSocketHandler {
                         gameData,
                         ChessGame.TeamColor.BLACK.toString()
                 );
-                connections.send(sess, loadGameWhite); // Send White's perspective to White
-                connections.broadcast(gameID, user, loadGameBlack); // Send Black's perspective to Black
+                if (isWhite) {
+                    connections.send(sess, loadGameWhite); // Send White's perspective to White
+                    connections.broadcast(gameID, user, loadGameBlack); // Send Black's perspective to Black
+                } else {
+                    connections.send(sess, loadGameBlack); // Send White's perspective to White
+                    connections.broadcast(gameID, user, loadGameWhite); // Send Black's perspective to Black
+                }
                 dataAccess.updateGame(gameData);
             } else {
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Oh no! It is not your turn.");
